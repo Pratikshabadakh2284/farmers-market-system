@@ -1,11 +1,37 @@
 const express = require("express");
 const router = express.Router();
-
 const { sql, connectDB } = require("../db/database");
 
-/*
-GET ALL VENDORS
-*/
+/* SEARCH */
+router.get("/search/:name", async (req, res) => {
+
+    try {
+
+        const pool = await connectDB();
+
+        const result = await pool.request()
+            .input("search", sql.VarChar, "%" + req.params.name + "%")
+            .query(`
+                SELECT *
+                FROM Vendors
+                WHERE VendorName LIKE @search
+            `);
+
+        res.json(result.recordset);
+
+    } catch (err) {
+
+        res.status(500).json({
+            message: err.message
+        });
+
+    }
+
+});
+
+
+/* GET ALL */
+
 router.get("/", async (req, res) => {
 
     try {
@@ -22,7 +48,36 @@ router.get("/", async (req, res) => {
 
     } catch (err) {
 
-        console.log(err);
+        res.status(500).json({
+            message: err.message
+        });
+
+    }
+
+});
+
+
+/* GET BY ID */
+
+router.get("/:id", async (req, res) => {
+
+    try {
+
+        const pool = await connectDB();
+
+        const result = await pool.request()
+
+            .input("VendorID", sql.Int, req.params.id)
+
+            .query(`
+                SELECT *
+                FROM Vendors
+                WHERE VendorID=@VendorID
+            `);
+
+        res.json(result.recordset[0]);
+
+    } catch (err) {
 
         res.status(500).json({
             message: err.message
@@ -31,5 +86,165 @@ router.get("/", async (req, res) => {
     }
 
 });
+
+
+/* ADD */
+
+router.post("/", async (req, res) => {
+
+    try {
+
+        const {
+            VendorName,
+            Phone,
+            Email,
+            ProductCategory
+        } = req.body;
+
+        const pool = await connectDB();
+
+        await pool.request()
+
+            .input("VendorName", sql.VarChar, VendorName)
+            .input("Phone", sql.VarChar, Phone)
+            .input("Email", sql.VarChar, Email)
+            .input("ProductCategory", sql.VarChar, ProductCategory)
+
+            .query(`
+
+                INSERT INTO Vendors
+                (
+                    VendorName,
+                    Phone,
+                    Email,
+                    ProductCategory
+                )
+
+                VALUES
+                (
+                    @VendorName,
+                    @Phone,
+                    @Email,
+                    @ProductCategory
+                )
+
+            `);
+
+        res.status(201).json({
+
+            message: "Vendor Added Successfully"
+
+        });
+
+    } catch (err) {
+
+        res.status(500).json({
+
+            message: err.message
+
+        });
+
+    }
+
+});
+
+
+/* UPDATE */
+
+router.put("/:id", async (req, res) => {
+
+    try {
+
+        const {
+
+            VendorName,
+            Phone,
+            Email,
+            ProductCategory
+
+        } = req.body;
+
+        const pool = await connectDB();
+
+        await pool.request()
+
+            .input("VendorID", sql.Int, req.params.id)
+            .input("VendorName", sql.VarChar, VendorName)
+            .input("Phone", sql.VarChar, Phone)
+            .input("Email", sql.VarChar, Email)
+            .input("ProductCategory", sql.VarChar, ProductCategory)
+
+            .query(`
+
+                UPDATE Vendors
+
+                SET
+
+                VendorName=@VendorName,
+                Phone=@Phone,
+                Email=@Email,
+                ProductCategory=@ProductCategory
+
+                WHERE VendorID=@VendorID
+
+            `);
+
+        res.json({
+
+            message: "Vendor Updated Successfully"
+
+        });
+
+    } catch (err) {
+
+        res.status(500).json({
+
+            message: err.message
+
+        });
+
+    }
+
+});
+
+
+/* DELETE */
+
+router.delete("/:id", async (req, res) => {
+
+    try {
+
+        const pool = await connectDB();
+
+        await pool.request()
+
+            .input("VendorID", sql.Int, req.params.id)
+
+            .query(`
+
+                DELETE
+                FROM Vendors
+                WHERE VendorID=@VendorID
+
+            `);
+
+        res.json({
+
+            message: "Vendor Deleted Successfully"
+
+        });
+
+    } catch (err) {
+
+        res.status(500).json({
+
+            message: err.message
+
+        });
+
+    }
+
+});
+
 
 module.exports = router;
