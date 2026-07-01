@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Vendor Management</title>
+
+<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<nav>
+
+    <a href="index.html">Dashboard</a>
+    <a href="vendors.html">Vendors</a>
+    <a href="stalls.html">Stalls</a>
+    <a href="allocations.html">Allocations</a>
+
+</nav>
+
+<div class="container">
+
+    <h1>Vendor Management</h1>
+
+    <div class="card">
+
+        <input
+            type="hidden"
+            id="vendorId">
+
+        <label>Vendor Name</label>
+
+        <input
+            type="text"
+            id="vendorName"
+            placeholder="Enter Vendor Name">
+
+        <label>Phone</label>
+
+        <input
+            type="text"
+            id="phone"
+            placeholder="Enter Phone Number">
+
+        <label>Email</label>
+
+        <input
+            type="email"
+            id="email"
+            placeholder="Enter Email">
+
+        <label>Product Category</label>
+
+        <select id="category">
+
+            <option value="">Select Category</option>
+
+            <option>Vegetables</option>
+
+            <option>Fruits</option>
+
+            <option>Dairy</option>
+
+            <option>Bakery</option>
+
+            <option>Flowers</option>
+
+            <option>Honey</option>
+
+        </select>
+
+        <button onclick="addVendor()">
+            Save Vendor
+        </button>
+
+        <button onclick="updateVendor()">
+            Update Vendor
+        </button>
+
+        <button onclick="clearForm()">
+            Clear
+        </button>
+
+    </div>
+
+    <div class="card">
+
+        <input
+            type="text"
+            id="search"
+            placeholder="Search Vendor..."
+            onkeyup="searchVendor()">
+
+    </div>
+
+    <div class="card">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>Name</th>
+
+                    <th>Phone</th>
+
+                    <th>Email</th>
+
+                    <th>Category</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="vendorTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<script src="/js/vendors.js"></script>
+
+</body>
+
+</html>
