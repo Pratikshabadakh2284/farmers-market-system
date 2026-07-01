@@ -3,8 +3,7 @@ const router = express.Router();
 const { sql, connectDB } = require("../db/database");
 
 /* SEARCH */
-router.get("/search/:name", async (req, res) => {
-
+router.get("/searchVendor/:name", async (req, res) => {
     try {
 
         const pool = await connectDB();
@@ -32,7 +31,7 @@ router.get("/search/:name", async (req, res) => {
 
 /* GET ALL */
 
-router.get("/", async (req, res) => {
+router.get("/getAllVendors", async (req, res) => {
 
     try {
 
@@ -59,8 +58,7 @@ router.get("/", async (req, res) => {
 
 /* GET BY ID */
 
-router.get("/:id", async (req, res) => {
-
+router.get("/getVendor/:id", async (req, res) => {
     try {
 
         const pool = await connectDB();
@@ -90,8 +88,7 @@ router.get("/:id", async (req, res) => {
 
 /* ADD */
 
-router.post("/", async (req, res) => {
-
+router.post("/addVendor", async (req, res) => {
     try {
 
         const {
@@ -151,8 +148,7 @@ router.post("/", async (req, res) => {
 
 /* UPDATE */
 
-router.put("/:id", async (req, res) => {
-
+router.put("/updateVendor/:id", async (req, res) => {
     try {
 
         const {
@@ -210,8 +206,7 @@ router.put("/:id", async (req, res) => {
 
 /* DELETE */
 
-router.delete("/:id", async (req, res) => {
-
+router.delete("/deleteVendor/:id", async (req, res) => {
     try {
 
         const pool = await connectDB();

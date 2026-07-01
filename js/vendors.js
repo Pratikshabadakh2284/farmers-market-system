@@ -12,7 +12,7 @@ async function loadVendors() {
 
     try {
 
-        const response = await fetch(API);
+        const response = await fetch(API + "/getAllVendors");   
 
         const vendors = await response.json();
 
@@ -102,7 +102,7 @@ async function addVendor() {
 
     }
 
-    await fetch(API, {
+    await fetch(API + "/addVendor", {
 
         method: "POST",
 
@@ -130,7 +130,7 @@ async function addVendor() {
 
 async function editVendor(id) {
 
-    const response = await fetch(API + "/" + id);
+    const response = await fetch(API + "/getVendor/" + id);
 
     const vendor = await response.json();
 
@@ -176,7 +176,7 @@ async function updateVendor() {
 
     };
 
-    await fetch(API + "/" + id, {
+    await fetch(API + "/updateVendor/" + id, {
 
         method: "PUT",
 
@@ -208,7 +208,7 @@ async function deleteVendor(id) {
 
     if (!answer) return;
 
-    await fetch(API + "/" + id, {
+    await fetch(API + "/deleteVendor/" + id, {
 
         method: "DELETE"
 
@@ -236,7 +236,7 @@ async function searchVendor() {
 
     }
 
-    const response = await fetch(API + "/search/" + search);
+    const response = await fetch(API + "/searchVendor/" + search);
 
     const vendors = await response.json();
 
