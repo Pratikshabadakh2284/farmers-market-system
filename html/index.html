@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-
 <html>
 
 <head>
 
-<title>Farmers Market Dashboard</title>
+    <title>Dashboard</title>
 
-<link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
 
 </head>
 
@@ -14,13 +13,13 @@
 
 <nav>
 
-<a href="index.html">Dashboard</a>
+<a href="/html/index.html">Dashboard</a>
 
-<a href="vendors.html">Vendors</a>
+<a href="/html/vendors.html">Vendors</a>
 
-<a href="stalls.html">Stalls</a>
+<a href="/html/stalls.html">Stalls</a>
 
-<a href="allocations.html">Allocations</a>
+<a href="/html/allocations.html">Allocations</a>
 
 </nav>
 
@@ -28,7 +27,9 @@
 
 <h1>Farmers Market Dashboard</h1>
 
-<div class="card">
+<div class="dashboard">
+
+<div class="dashboard-card">
 
 <h2>Total Vendors</h2>
 
@@ -36,7 +37,7 @@
 
 </div>
 
-<div class="card">
+<div class="dashboard-card">
 
 <h2>Total Stalls</h2>
 
@@ -44,25 +45,35 @@
 
 </div>
 
-<div class="card">
+<div class="dashboard-card">
 
-<h2>Occupied Stalls</h2>
-
-<h1 id="occupied">0</h1>
-
-</div>
-
-<div class="card">
-
-<h2>Available Stalls</h2>
+<h2>Available</h2>
 
 <h1 id="available">0</h1>
 
 </div>
 
+<div class="dashboard-card">
+
+<h2>Occupied</h2>
+
+<h1 id="occupied">0</h1>
+
 </div>
 
-<script src="js/dashboard.js"></script>
+<div class="dashboard-card">
+
+<h2>Allocations</h2>
+
+<h1 id="allocations">0</h1>
+
+</div>
+
+</div>
+
+</div>
+
+<script src="/js/dashboard.js"></script>
 
 </body>
 

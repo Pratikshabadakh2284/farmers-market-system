@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Stall Management</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+
+</head>
+
+<body>
+
+<nav>
+
+    <a href="/html/index.html">Dashboard</a>
+    <a href="/html/vendors.html">Vendors</a>
+    <a href="/html/stalls.html">Stalls</a>
+    <a href="/html/allocations.html">Allocations</a>
+
+</nav>
+
+<div class="container">
+
+<h1>Stall Management</h1>
+
+<div class="card">
+
+<input type="hidden" id="stallId">
+
+<label>Stall Number</label>
+<input type="text" id="stallNumber">
+
+<label>Location Zone</label>
+<select id="locationZone">
+
+<option value="">Select Zone</option>
+<option>North</option>
+<option>South</option>
+<option>East</option>
+<option>West</option>
+
+</select>
+
+<label>Rental Fee ($)</label>
+<input type="number" id="rentalFee">
+
+<label>Status</label>
+
+<select id="status">
+
+<option>Available</option>
+<option>Occupied</option>
+
+</select>
+
+<button onclick="addStall()">Save Stall</button>
+
+<button onclick="updateStall()">Update Stall</button>
+
+<button onclick="clearForm()">Clear</button>
+
+</div>
+
+<div class="card">
+
+<input
+type="text"
+id="search"
+placeholder="Search Stall Number..."
+onkeyup="searchStall()">
+
+</div>
+
+<div class="card">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+
+<th>Stall</th>
+
+<th>Zone</th>
+
+<th>Rental</th>
+
+<th>Status</th>
+
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="stallTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<script src="/js/stalls.js"></script>
+
+</body>
+
+</html>

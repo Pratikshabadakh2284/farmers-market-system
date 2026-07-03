@@ -1,16 +1,30 @@
-async function loadDashboard(){
+async function loadDashboard() {
 
-const response=await fetch("/api/dashboard");
+    try {
 
-const data=await response.json();
+        const response = await fetch("http://localhost:3000/api/dashboard");
 
-document.getElementById("vendors").innerHTML=data.vendors;
+        const data = await response.json();
 
-document.getElementById("stalls").innerHTML=data.stalls;
+        console.log(data);
 
-document.getElementById("occupied").innerHTML=data.occupied;
+        document.getElementById("vendors").innerHTML = data.vendors;
 
-document.getElementById("available").innerHTML=data.available;
+        document.getElementById("stalls").innerHTML = data.stalls;
+
+        document.getElementById("available").innerHTML = data.available;
+
+        document.getElementById("occupied").innerHTML = data.occupied;
+
+        document.getElementById("allocations").innerHTML = data.allocations;
+
+    }
+
+    catch (err) {
+
+        console.error(err);
+
+    }
 
 }
 

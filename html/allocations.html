@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Allocation Management</title>
+
+<link rel="stylesheet" href="/css/style.css">
+
+</head>
+
+<body>
+
+<nav>
+
+<a href="/html/index.html">Dashboard</a>
+
+<a href="/html/vendors.html">Vendors</a>
+
+<a href="/html/stalls.html">Stalls</a>
+
+<a href="/html/allocations.html">Allocations</a>
+
+</nav>
+
+<div class="container">
+
+<h1>Allocation Management</h1>
+
+<div class="card">
+
+<input type="hidden" id="allocationId">
+
+<label>Vendor</label>
+
+<select id="vendor"></select>
+
+<label>Available Stall</label>
+
+<select id="stall"></select>
+
+<label>Allocation Date</label>
+
+<input type="date" id="allocationDate">
+
+<button onclick="addAllocation()">
+
+Allocate Stall
+
+</button>
+
+</div>
+
+<div class="card">
+
+<input
+
+type="text"
+
+id="search"
+
+placeholder="Search Vendor"
+
+onkeyup="searchAllocation()"
+
+>
+
+</div>
+
+<div class="card">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+
+<th>Vendor</th>
+
+<th>Stall</th>
+
+<th>Zone</th>
+
+<th>Date</th>
+
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="allocationTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<script src="/js/allocations.js"></script>
+
+</body>
+
+</html>

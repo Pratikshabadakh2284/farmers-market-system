@@ -4,7 +4,7 @@ const { sql, connectDB } = require("../db/database");
 
 /* SEARCH STALL */
 
-router.get("/search/:stall", async (req, res) => {
+router.get("/searchStall/:stall", async (req, res) => {
 
     try {
 
@@ -33,8 +33,7 @@ router.get("/search/:stall", async (req, res) => {
 
 /* GET ALL STALLS */
 
-router.get("/", async (req, res) => {
-
+router.get("/getAllStalls", async (req, res) => {
     try {
 
         const pool = await connectDB();
@@ -60,8 +59,7 @@ router.get("/", async (req, res) => {
 
 /* GET STALL BY ID */
 
-router.get("/:id", async (req, res) => {
-
+router.get("/getStall/:id", async (req, res) => {
     try {
 
         const pool = await connectDB();
@@ -89,10 +87,34 @@ router.get("/:id", async (req, res) => {
 
 /* ADD STALL */
 
-router.post("/", async (req, res) => {
-
+router.post("/addStall", async (req, res) => {
     try {
 
+        if (
+            !StallNumber ||
+            !LocationZone ||
+            !RentalFee ||
+            !Status
+        ) {
+            return res.status(400).json({
+                message: "Please fill all required fields."
+            });
+        }
+        const check = await pool.request()
+            .input("StallNumber", sql.VarChar, StallNumber)
+            .query(`
+        SELECT *
+        FROM Stalls
+        WHERE StallNumber = @StallNumber
+    `);
+
+        if (check.recordset.length > 0) {
+
+            return res.status(400).json({
+                message: "Stall Number already exists."
+            });
+
+        }
         const {
 
             StallNumber,
@@ -108,7 +130,7 @@ router.post("/", async (req, res) => {
 
             .input("StallNumber", sql.VarChar, StallNumber)
             .input("LocationZone", sql.VarChar, LocationZone)
-            .input("RentalFee", sql.Decimal(10,2), RentalFee)
+            .input("RentalFee", sql.Decimal(10, 2), RentalFee)
             .input("Status", sql.VarChar, Status)
 
             .query(`
@@ -152,7 +174,7 @@ router.post("/", async (req, res) => {
 
 /* UPDATE STALL */
 
-router.put("/:id", async (req, res) => {
+router.put("/updateStall/:id", async (req, res) => {
 
     try {
 
@@ -172,7 +194,7 @@ router.put("/:id", async (req, res) => {
             .input("StallID", sql.Int, req.params.id)
             .input("StallNumber", sql.VarChar, StallNumber)
             .input("LocationZone", sql.VarChar, LocationZone)
-            .input("RentalFee", sql.Decimal(10,2), RentalFee)
+            .input("RentalFee", sql.Decimal(10, 2), RentalFee)
             .input("Status", sql.VarChar, Status)
 
             .query(`
@@ -211,12 +233,23 @@ router.put("/:id", async (req, res) => {
 
 /* DELETE STALL */
 
-router.delete("/:id", async (req, res) => {
-
+router.delete("/deleteStall/:id", async (req, res) => {
     try {
 
         const pool = await connectDB();
+        const allocation = await pool.request()
+            .input("StallID", sql.Int, req.params.id)
+            .query(`
+        SELECT *
+        FROM Allocations
+        WHERE StallID = @StallID
+    `);
 
+        if (allocation.recordset.length > 0) {
+            return res.status(400).json({
+                message: "Cannot delete. Stall is allocated."
+            });
+        }
         await pool.request()
 
             .input("StallID", sql.Int, req.params.id)
