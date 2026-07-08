@@ -6,6 +6,7 @@ const vendorRoutes = require("./routes/vendors");
 const stallRoutes = require("./routes/stalls");
 const allocationRoutes = require("./routes/allocations");
 const dashboardRoutes = require("./routes/dashboard");
+const authRoutes = require("./routes/auth");
 const app = express();
 
 app.use(cors());
@@ -19,14 +20,16 @@ app.use("/api/vendors", vendorRoutes);
 app.use("/api/stalls", stallRoutes);
 app.use("/api/allocations", allocationRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-
+app.use("/api/auth", authRoutes);
 app.get("/", (req, res) => {
-    res.send("Farmers Market API Running");
+    res.sendFile(__dirname + "/html/login.html");
 });
 
 const PORT = 3000;
 
 connectDB().then(() => {
+    console.log("Restart Test");
+
     app.listen(PORT, () => {
         console.log(`Server running on http://localhost:${PORT}`);
     });

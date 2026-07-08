@@ -1,206 +1,84 @@
-const API = "http://localhost:3000/api/stalls";
-
-window.onload = loadStalls;
-
-// =========================
-// LOAD ALL
-// =========================
-
-async function loadStalls(){
-
-const response=await fetch(API+"/getAllStalls");
-
-const stalls=await response.json();
-
-const table=document.getElementById("stallTable");
-
-if(stalls.length===0){
-
-table.innerHTML=`
-<tr>
-<td colspan="6" style="text-align:center;color:red">
-No Stalls Found
-</td>
-</tr>
-`;
-
-return;
-
-}
-
-let rows="";
-
-stalls.forEach(stall=>{
-
-rows+=`
-
-<tr>
-
-<td>${stall.StallID}</td>
-
-<td>${stall.StallNumber}</td>
-
-<td>${stall.LocationZone}</td>
-
-<td>$${stall.RentalFee}</td>
-
-<td>${stall.Status}</td>
-
-<td>
-
-<button onclick="editStall(${stall.StallID})">
-
-Edit
-
-</button>
-
-<button onclick="deleteStall(${stall.StallID})">
-
-Delete
-
-</button>
-
-</td>
-
-</tr>
-
-`;
-
-});
-
-table.innerHTML=rows;
-
-}
-
-// =========================
-// ADD
-// =========================
-
-async function addStall(){
-
-const stall={
-
-StallNumber:document.getElementById("stallNumber").value,
-
-LocationZone:document.getElementById("locationZone").value,
-
-RentalFee:document.getElementById("rentalFee").value,
-
-Status:document.getElementById("status").value
-
-};
-
-await fetch(API+"/addStall",{
-
-method:"POST",
-
-headers:{
-
-"Content-Type":"application/json"
-
-},
-
-body:JSON.stringify(stall)
-
-});
-
-clearForm();
+const api = "http://localhost:3000/api/stalls";
 
 loadStalls();
 
-}
+async function loadStalls() {
 
-// =========================
-// EDIT
-// =========================
+    const response = await fetch(api);
 
-async function editStall(id){
+    const data = await response.json();
 
-const response=await fetch(API+"/getStall/"+id);
+    let html = "";
 
-const stall=await response.json();
+    if (data.length === 0) {
 
-document.getElementById("stallId").value=stall.StallID;
+        html = `
+        <tr>
+            <td colspan="6">No Stall Found</td>
+        </tr>
+        `;
 
-document.getElementById("stallNumber").value=stall.StallNumber;
+    } else {
 
-document.getElementById("locationZone").value=stall.LocationZone;
+        data.forEach(stall => {
 
-document.getElementById("rentalFee").value=stall.RentalFee;
+            html += `
+            <tr>
 
-document.getElementById("status").value=stall.Status;
+                <td>${stall.StallID}</td>
 
-}
+                <td>${stall.StallNumber}</td>
 
-// =========================
-// UPDATE
-// =========================
+                <td>${stall.LocationZone}</td>
 
-async function updateStall(){
+                <td>₹ ${stall.RentalFee}</td>
 
-const id=document.getElementById("stallId").value;
+                <td>
 
-const stall={
+                <span class="${stall.Status=="Available"?"available":"occupied"}">
 
-StallNumber:document.getElementById("stallNumber").value,
+                ${stall.Status}
 
-LocationZone:document.getElementById("locationZone").value,
+                </span>
 
-RentalFee:document.getElementById("rentalFee").value,
+                </td>
 
-Status:document.getElementById("status").value
+                <td>
 
-};
+                <button class="edit-btn"
 
-await fetch(API+"/updateStall/"+id,{
+                onclick="editStall(${stall.StallID})">
 
-method:"PUT",
+                <i class="fa-solid fa-pen"></i>
 
-headers:{
+                </button>
 
-"Content-Type":"application/json"
+                <button class="delete-btn"
 
-},
+                onclick="deleteStall(${stall.StallID})">
 
-body:JSON.stringify(stall)
+                <i class="fa-solid fa-trash"></i>
 
-});
+                </button>
 
-clearForm();
+                </td>
 
-loadStalls();
+            </tr>
+            `;
 
-}
+        });
 
-// =========================
-// DELETE
-// =========================
+    }
 
-async function deleteStall(id){
-
-if(!confirm("Delete Stall?"))
-
-return;
-
-await fetch(API+"/deleteStall/"+id,{
-
-method:"DELETE"
-
-});
-
-loadStalls();
+    document.getElementById("stallTable").innerHTML = html;
 
 }
-
-// =========================
-// SEARCH
-// =========================
 
 async function searchStall(){
 
-const search=document.getElementById("search").value;
+const text=document.getElementById("search").value;
 
-if(search===""){
+if(text==""){
 
 loadStalls();
 
@@ -208,21 +86,20 @@ return;
 
 }
 
-const response=await fetch(API+"/searchStall/"+search);
+const response=await fetch(api+"/search/"+text);
 
-const stalls=await response.json();
+const data=await response.json();
 
-let rows="";
+let html="";
 
-if(stalls.length===0){
+if(data.length==0){
 
-document.getElementById("stallTable").innerHTML=`
-
+html=`
 <tr>
 
 <td colspan="6">
 
-No Stalls Found
+No Stall Found
 
 </td>
 
@@ -230,13 +107,11 @@ No Stalls Found
 
 `;
 
-return;
+}else{
 
-}
+data.forEach(stall=>{
 
-stalls.forEach(stall=>{
-
-rows+=`
+html+=`
 
 <tr>
 
@@ -246,21 +121,33 @@ rows+=`
 
 <td>${stall.LocationZone}</td>
 
-<td>$${stall.RentalFee}</td>
-
-<td>${stall.Status}</td>
+<td>₹ ${stall.RentalFee}</td>
 
 <td>
 
-<button onclick="editStall(${stall.StallID})">
+<span class="${stall.Status=="Available"?"available":"occupied"}">
 
-Edit
+${stall.Status}
+
+</span>
+
+</td>
+
+<td>
+
+<button class="edit-btn"
+
+onclick="editStall(${stall.StallID})">
+
+<i class="fa-solid fa-pen"></i>
 
 </button>
 
-<button onclick="deleteStall(${stall.StallID})">
+<button class="delete-btn"
 
-Delete
+onclick="deleteStall(${stall.StallID})">
+
+<i class="fa-solid fa-trash"></i>
 
 </button>
 
@@ -272,24 +159,8 @@ Delete
 
 });
 
-document.getElementById("stallTable").innerHTML=rows;
-
 }
 
-// =========================
-// CLEAR
-// =========================
-
-function clearForm(){
-
-document.getElementById("stallId").value="";
-
-document.getElementById("stallNumber").value="";
-
-document.getElementById("locationZone").value="";
-
-document.getElementById("rentalFee").value="";
-
-document.getElementById("status").value="Available";
+document.getElementById("stallTable").innerHTML=html;
 
 }

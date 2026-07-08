@@ -1,7 +1,13 @@
+
 async function loadDashboard() {
 
     try {
 
+        if (!localStorage.getItem("role")) {
+
+    window.location.href = "/";
+
+}
         const response = await fetch("http://localhost:3000/api/dashboard");
 
         const data = await response.json();

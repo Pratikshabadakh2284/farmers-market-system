@@ -1,37 +1,73 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 
-    <title>Dashboard</title>
+<meta charset="UTF-8">
 
-    <link rel="stylesheet" href="/css/style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dashboard</title>
+
+<link rel="stylesheet" href="/css/style.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
 </head>
 
 <body>
 
-<nav>
+<div class="sidebar">
 
-<a href="/html/index.html">Dashboard</a>
+<h2>🌾 Farmers Market</h2>
 
-<a href="/html/vendors.html">Vendors</a>
+<a href="/html/index.html">
+<i class="fa-solid fa-chart-line"></i>
+Dashboard
+</a>
 
-<a href="/html/stalls.html">Stalls</a>
+<a href="/html/vendors.html">
+<i class="fa-solid fa-users"></i>
+Vendors
+</a>
 
-<a href="/html/allocations.html">Allocations</a>
+<a href="/html/stalls.html">
+<i class="fa-solid fa-store"></i>
+Stalls
+</a>
 
-</nav>
+<a href="/html/allocations.html">
+<i class="fa-solid fa-calendar-days"></i>
+Allocations
+</a>
 
-<div class="container">
+<a href="/html/reports.html">
+<i class="fa-solid fa-file-lines"></i>
+Reports
+</a>
 
-<h1>Farmers Market Dashboard</h1>
+<a href="/html/profile.html">
+<i class="fa-solid fa-user"></i>
+Profile
+</a>
+
+<a href="/html/login.html">
+<i class="fa-solid fa-right-from-bracket"></i>
+Logout
+</a>
+
+</div>
+
+<div class="main">
+
+<h1>Dashboard</h1>
 
 <div class="dashboard">
 
 <div class="dashboard-card">
 
-<h2>Total Vendors</h2>
+<h3>Total Vendors</h3>
 
 <h1 id="vendors">0</h1>
 
@@ -39,7 +75,7 @@
 
 <div class="dashboard-card">
 
-<h2>Total Stalls</h2>
+<h3>Total Stalls</h3>
 
 <h1 id="stalls">0</h1>
 
@@ -47,7 +83,7 @@
 
 <div class="dashboard-card">
 
-<h2>Available</h2>
+<h3>Available</h3>
 
 <h1 id="available">0</h1>
 
@@ -55,7 +91,7 @@
 
 <div class="dashboard-card">
 
-<h2>Occupied</h2>
+<h3>Occupied</h3>
 
 <h1 id="occupied">0</h1>
 
@@ -63,13 +99,49 @@
 
 <div class="dashboard-card">
 
-<h2>Allocations</h2>
+<h3>Allocations</h3>
 
 <h1 id="allocations">0</h1>
 
 </div>
 
 </div>
+
+<br><br>
+
+<tr>
+
+<td>Vendor Management</td>
+
+<td><span class="available">Working</span></td>
+
+</tr>
+
+<tr>
+
+<td>Stall Management</td>
+
+<td><span class="available">Working</span></td>
+
+</tr>
+
+<tr>
+
+<td>Allocation</td>
+
+<td><span class="available">Working</span></td>
+
+</tr>
+
+<tr>
+
+<td>Dashboard</td>
+
+<td><span class="available">Working</span></td>
+
+</tr>
+
+</table>
 
 </div>
 

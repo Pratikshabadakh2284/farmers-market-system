@@ -1,8 +1,8 @@
+require("dotenv").config();
 const sql = require("mssql/msnodesqlv8");
 
 const config = {
-    connectionString:
-        "Driver={ODBC Driver 17 for SQL Server};Server=(localdb)\\MSSQLLocalDB;Database=FarmersMarketDB;Trusted_Connection=Yes;"
+    connectionString: `Driver={ODBC Driver 17 for SQL Server};Server=${process.env.DB_SERVER};Database=${process.env.DB_DATABASE};Trusted_Connection=Yes;`
 };
 
 async function connectDB() {
