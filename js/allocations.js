@@ -150,7 +150,7 @@ async function addAllocation() {
 
         StallID: document.getElementById("stall").value,
 
-        MarketDate: document.getElementById("marketDate").value
+        MarketDate: document.getElementById("allocationDate").value
 
     };
 

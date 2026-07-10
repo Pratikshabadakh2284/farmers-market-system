@@ -3,141 +3,123 @@
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Vendors</title>
+    <title>Vendors</title>
 
-<link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
 
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
 </head>
 
 <body>
 
-<div class="sidebar">
+    <div class="sidebar">
 
-<h2>🌾 Farmers Market</h2>
+        <h2>🌾 Farmers Market</h2>
 
-<a href="/html/index.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+        <a href="/html/index.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
 
-<a href="/html/vendors.html" class="active"><i class="fa-solid fa-users"></i> Vendors</a>
+        <a href="/html/vendors.html" class="active"><i class="fa-solid fa-users"></i> Vendors</a>
 
-<a href="/html/stalls.html"><i class="fa-solid fa-store"></i> Stalls</a>
+        <a href="/html/stalls.html"><i class="fa-solid fa-store"></i> Stalls</a>
 
-<a href="/html/allocations.html"><i class="fa-solid fa-calendar-days"></i> Allocations</a>
+        <a href="/html/allocations.html"><i class="fa-solid fa-calendar-days"></i> Allocations</a>
 
-<a href="/html/reports.html"><i class="fa-solid fa-file-lines"></i> Reports</a>
+        <a href="/html/reports.html"><i class="fa-solid fa-file-lines"></i> Reports</a>
 
-<a href="/html/login.html"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+        <a href="/html/login.html"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
 
-</div>
+    </div>
 
-<div class="main">
+    <div class="main">
 
-<h1>Vendor Management</h1>
+        <h1>Vendor Management</h1>
 
-<div class="card">
+        <div class="card">
 
-<h2>Add / Update Vendor</h2>
+            <h2>Add / Update Vendor</h2>
 
-<form id="vendorForm">
+            <form id="vendorForm">
 
-<input type="hidden" id="VendorID">
+                <input type="hidden" id="VendorID">
 
-<label>Vendor Name</label>
+                <label>Vendor Name</label>
 
-<input type="text" id="VendorName" required>
+                <input type="text" id="VendorName" required>
 
-<label>Phone</label>
+                <label>Phone</label>
 
-<input type="text" id="PhoneNumber" required>
+                <input type="text" id="PhoneNumber" required>
 
-<label>Email</label>
+                <label>Email</label>
 
-<input type="email" id="Email" required>
+                <input type="email" id="Email" required>
 
-<label>Product Type</label>
+                <label>Product Type</label>
 
-<input type="text" id="ProductType" required>
+                <input type="text" id="ProductType" required>
 
-<button type="submit">
+                <button type="submit" id="saveBtn">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Save Vendor
+                </button>
 
-<i class="fa-solid fa-floppy-disk"></i>
+                <button type="button" id="updateBtn" onclick="updateVendor()" style="display:none;">
+                    <i class="fa-solid fa-pen"></i>
+                    Update Vendor
+                </button>
 
-Save Vendor
+            </form>
 
-</button>
+        </div>
 
-</form>
+        <br>
 
-</div>
+        <div class="card">
 
-<br>
+            <div class="search-box">
 
-<div class="card">
+                <input type="text" id="search" placeholder="Search Vendor" onkeyup="searchVendor()">
 
-<div class="search-box">
+            </div>
 
-<input
-type="text"
-id="searchVendor"
-placeholder="Search Vendor">
+            <table>
 
-<button onclick="searchVendor()">
+                <thead>
 
-<i class="fa-solid fa-magnifying-glass"></i>
+                    <tr>
 
-Search
+                        <th>ID</th>
 
-</button>
+                        <th>Name</th>
 
-<button onclick="loadVendors()">
+                        <th>Phone</th>
 
-<i class="fa-solid fa-rotate"></i>
+                        <th>Email</th>
 
-Refresh
+                        <th>Product</th>
 
-</button>
+                        <th>Action</th>
 
-</div>
+                    </tr>
 
-<table>
+                </thead>
 
-<thead>
+                <tbody id="vendorTable">
 
-<tr>
+                </tbody>
 
-<th>ID</th>
+            </table>
 
-<th>Name</th>
+        </div>
 
-<th>Phone</th>
+    </div>
 
-<th>Email</th>
-
-<th>Product</th>
-
-<th>Action</th>
-
-</tr>
-
-</thead>
-
-<tbody id="vendorTable">
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-<script src="/js/vendors.js"></script>
+    <script src="/js/vendors.js"></script>
 
 </body>
 

@@ -89,52 +89,41 @@ router.get("/getStall/:id", async (req, res) => {
 
 router.post("/addStall", async (req, res) => {
     try {
-
-        if (
-            !StallNumber ||
-            !LocationZone ||
-            !RentalFee ||
-            !Status
-        ) {
-            return res.status(400).json({
-                message: "Please fill all required fields."
-            });
-        }
-        const check = await pool.request()
-            .input("StallNumber", sql.VarChar, StallNumber)
-            .query(`
-        SELECT *
-        FROM Stalls
-        WHERE StallNumber = @StallNumber
-    `);
-
-        if (check.recordset.length > 0) {
-
-            return res.status(400).json({
-                message: "Stall Number already exists."
-            });
-
-        }
         const {
-
             StallNumber,
             LocationZone,
             RentalFee,
             Status
-
         } = req.body;
+
+        if (!StallNumber || !LocationZone || !RentalFee || !Status) {
+            return res.status(400).json({
+                message: "Please fill all required fields."
+            });
+        }
 
         const pool = await connectDB();
 
-        await pool.request()
+        const check = await pool.request()
+            .input("StallNumber", sql.VarChar, StallNumber)
+            .query(`
+                SELECT *
+                FROM Stalls
+                WHERE StallNumber = @StallNumber
+            `);
 
+        if (check.recordset.length > 0) {
+            return res.status(400).json({
+                message: "Stall Number already exists."
+            });
+        }
+
+        await pool.request()
             .input("StallNumber", sql.VarChar, StallNumber)
             .input("LocationZone", sql.VarChar, LocationZone)
             .input("RentalFee", sql.Decimal(10, 2), RentalFee)
             .input("Status", sql.VarChar, Status)
-
             .query(`
-
                 INSERT INTO Stalls
                 (
                     StallNumber,
@@ -142,7 +131,6 @@ router.post("/addStall", async (req, res) => {
                     RentalFee,
                     Status
                 )
-
                 VALUES
                 (
                     @StallNumber,
@@ -150,25 +138,17 @@ router.post("/addStall", async (req, res) => {
                     @RentalFee,
                     @Status
                 )
-
             `);
 
         res.status(201).json({
-
             message: "Stall Added Successfully"
-
         });
 
     } catch (err) {
-
         res.status(500).json({
-
             message: err.message
-
         });
-
     }
-
 });
 
 

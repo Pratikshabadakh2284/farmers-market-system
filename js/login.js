@@ -1,72 +1,42 @@
-const form = document.getElementById("loginForm");
+document.addEventListener("DOMContentLoaded", function () {
 
-form.addEventListener("submit", async function (e) {
+    localStorage.clear();
 
-    e.preventDefault();
+    const form = document.getElementById("loginForm");
 
-    const username = document.getElementById("username").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const message = document.getElementById("message");
+    form.addEventListener("submit", async function (e) {
+        e.preventDefault();
 
-    message.innerHTML = "";
+        const username = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const message = document.getElementById("message");
 
-    try {
+        try {
+            const response = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ username, password })
+            });
 
-        const response = await fetch("/api/auth/login", {
+            const data = await response.json();
 
-            method: "POST",
+            if (response.ok) {
+                localStorage.setItem("username", data.username);
+                localStorage.setItem("role", data.role);
 
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify({
-                username,
-                password
-            })
-
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-
-            localStorage.setItem("role", data.role);
-            localStorage.setItem("username", data.username);
-            localStorage.setItem("vendorID", data.vendorID);
-
-            if (data.role === "Farmer") {
-
-                window.location.href = "/html/farmer.html";
-
+                window.location.href = "/html/index.html";
             } else {
+                message.innerHTML = data.message;
+                document.getElementById("username").value = "";
+                document.getElementById("password").value = "";
+            }
 
-    message.innerHTML = data.message;
-    message.className = "error-message";
-
-    // Clear the fields
-    document.getElementById("username").value = "";
-    document.getElementById("password").value = "";
-
-    // Focus back on username
-    document.getElementById("username").focus();
-
-}
-
-        } else {
-
-            message.innerHTML = data.message;
-            message.className = "error-message";
-
+        } catch (err) {
+            message.innerHTML = "Server connection failed.";
+            console.log(err);
         }
-
-    } catch (err) {
-
-        message.innerHTML = "Unable to connect to server.";
-        message.className = "error-message";
-
-        console.log(err);
-
-    }
+    });
 
 });

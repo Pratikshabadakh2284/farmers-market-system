@@ -2,109 +2,94 @@
 <html lang="en">
 
 <head>
-
-<meta charset="UTF-8">
-
-<title>Allocation Management</title>
-
-<link rel="stylesheet" href="/css/style.css">
-
+    <meta charset="UTF-8">
+    <title>Allocation Management</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 
 <body>
 
-<nav>
+<div class="sidebar">
+    <h2>🌾 Farmers Market</h2>
 
-<a href="/html/index.html">Dashboard</a>
+    <a href="/html/index.html">
+        <i class="fa-solid fa-chart-line"></i> Dashboard
+    </a>
 
-<a href="/html/vendors.html">Vendors</a>
+    <a href="/html/vendors.html">
+        <i class="fa-solid fa-users"></i> Vendors
+    </a>
 
-<a href="/html/stalls.html">Stalls</a>
+    <a href="/html/stalls.html">
+        <i class="fa-solid fa-store"></i> Stalls
+    </a>
 
-<a href="/html/allocations.html">Allocations</a>
+    <a href="/html/allocations.html" class="active">
+        <i class="fa-solid fa-calendar-days"></i> Allocations
+    </a>
 
-</nav>
+    <a href="/html/reports.html">
+        <i class="fa-solid fa-file-lines"></i> Reports
+    </a>
 
-<div class="container">
-
-<h1>Allocation Management</h1>
-
-<div class="card">
-
-<input type="hidden" id="allocationId">
-
-<label>Vendor</label>
-
-<select id="vendor"></select>
-
-<label>Available Stall</label>
-
-<select id="stall"></select>
-
-<label>Allocation Date</label>
-
-<input type="date" id="allocationDate">
-
-<button onclick="addAllocation()">
-
-Allocate Stall
-
-</button>
-
+    <a href="/html/login.html">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+    </a>
 </div>
 
-<div class="card">
+<div class="main">
 
-<input
+    <h1>📅 Allocation Management</h1>
 
-type="text"
+    <div class="card">
+        <input type="hidden" id="allocationId">
 
-id="search"
+        <label>Vendor</label>
+        <select id="vendor"></select>
 
-placeholder="Search Vendor"
+        <label>Available Stall</label>
+        <select id="stall"></select>
 
-onkeyup="searchAllocation()"
+        <label>Market Date</label>
+        <input type="date" id="allocationDate">
 
->
+        <button onclick="addAllocation()">
+            <i class="fa-solid fa-calendar-plus"></i> Allocate Stall
+        </button>
+    </div>
 
-</div>
+    <br>
 
-<div class="card">
+    <div class="card">
+        <div class="search-box">
+            <input
+                type="text"
+                id="search"
+                placeholder="Search Vendor"
+                onkeyup="searchAllocation()">
+        </div>
 
-<table>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Vendor</th>
+                    <th>Stall</th>
+                    <th>Zone</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
 
-<thead>
-
-<tr>
-
-<th>ID</th>
-
-<th>Vendor</th>
-
-<th>Stall</th>
-
-<th>Zone</th>
-
-<th>Date</th>
-
-<th>Action</th>
-
-</tr>
-
-</thead>
-
-<tbody id="allocationTable">
-
-</tbody>
-
-</table>
-
-</div>
+            <tbody id="allocationTable"></tbody>
+        </table>
+    </div>
 
 </div>
 
 <script src="/js/allocations.js"></script>
 
 </body>
-
 </html>
