@@ -11,3 +11,26 @@ The system provides a centralised interface for managing vendor information, sta
 Managing farmers market stalls manually can lead to duplicate allocations, inaccurate stall availability information and difficulty maintaining vendor records.
 
 The purpose of this system is to provide a structured digital solution for managing vendors, stalls and allocations using a central SQL Server database.
+
+## Stakeholders
+
+- Market Administrator
+
+## Functional Requirements
+
+- Manage vendor records using CRUD operations.
+- Manage market stall records.
+- Search vendors and stalls.
+- Allocate available stalls to vendors.
+- Prevent invalid stall allocations.
+- Update stall availability during allocation.
+- Display dashboard information.
+- Generate report data.
+
+## Non-Functional Requirements
+
+- The system should provide a simple and responsive interface.
+- User input should be validated.
+- SQL queries should use parameterised inputs.
+- The application should provide clear success and error messages.
+- The system should maintain consistent data between stalls and allocations.
