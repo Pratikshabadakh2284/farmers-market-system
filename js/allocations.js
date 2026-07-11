@@ -5,13 +5,15 @@ const API = "http://localhost:3000/api/allocations";
 =========================== */
 
 window.onload = () => {
+    const today = new Date().toISOString().split("T")[0];
+
+    document
+        .getElementById("allocationDate")
+        .setAttribute("min", today);
 
     loadVendors();
-
     loadAvailableStalls();
-
     loadAllocations();
-
 };
 
 
@@ -143,41 +145,44 @@ async function loadAllocations() {
 =========================== */
 
 async function addAllocation() {
-
     const allocation = {
-
         VendorID: document.getElementById("vendor").value,
-
         StallID: document.getElementById("stall").value,
-
         MarketDate: document.getElementById("allocationDate").value
-
     };
 
-    const response = await fetch(API + "/addAllocation", {
+    if (!validateAllocation(allocation)) {
+        return;
+    }
 
-        method: "POST",
+    try {
+        const response = await fetch(API + "/addAllocation", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(allocation)
+        });
 
-        headers: {
+        const result = await response.json();
 
-            "Content-Type": "application/json"
+        if (!response.ok) {
+            alert(result.message || "Unable to create allocation.");
+            return;
+        }
 
-        },
+        alert(result.message);
 
-        body: JSON.stringify(allocation)
+        clearAllocationForm();
 
-    });
+        await loadAllocations();
+        await loadAvailableStalls();
 
-    const result = await response.json();
-
-    alert(result.message);
-
-    loadAllocations();
-
-    loadAvailableStalls();
-
+    } catch (error) {
+        console.error(error);
+        alert("Unable to connect to the server.");
+    }
 }
-
 
 /* ===========================
    DELETE ALLOCATION
@@ -284,4 +289,45 @@ async function searchAllocation() {
 
     document.getElementById("allocationTable").innerHTML = html;
 
+}
+
+function validateAllocation(allocation) {
+    if (!allocation.VendorID) {
+        alert("Please select a vendor.");
+        document.getElementById("vendor").focus();
+        return false;
+    }
+
+    if (!allocation.StallID) {
+        alert("Please select an available stall.");
+        document.getElementById("stall").focus();
+        return false;
+    }
+
+    if (!allocation.MarketDate) {
+        alert("Please select a market date.");
+        document.getElementById("allocationDate").focus();
+        return false;
+    }
+
+    const selectedDate = new Date(
+        allocation.MarketDate + "T00:00:00"
+    );
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (selectedDate < today) {
+        alert("Market date cannot be in the past.");
+        document.getElementById("allocationDate").focus();
+        return false;
+    }
+
+    return true;
+}
+
+function clearAllocationForm() {
+    document.getElementById("vendor").value = "";
+    document.getElementById("stall").value = "";
+    document.getElementById("allocationDate").value = "";
 }

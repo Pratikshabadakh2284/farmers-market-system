@@ -43,25 +43,33 @@
 
             <h2>Add / Update Vendor</h2>
 
-            <form id="vendorForm">
+            <form id="vendorForm" novalidate>
 
                 <input type="hidden" id="VendorID">
 
-                <label>Vendor Name</label>
+                <label for="VendorName">Vendor Name</label>
+                <input type="text" id="VendorName" minlength="2" maxlength="100" placeholder="Enter vendor name"
+                    required>
 
-                <input type="text" id="VendorName" required>
+                <label for="PhoneNumber">Phone</label>
+                <input type="tel" id="PhoneNumber" inputmode="numeric" maxlength="10" pattern="[0-9]{10}"
+                    placeholder="Enter 10-digit phone number" required>
 
-                <label>Phone</label>
+                <label for="Email">Email</label>
+                <input type="email" id="Email" maxlength="100" placeholder="Enter email address" required>
 
-                <input type="text" id="PhoneNumber" required>
-
-                <label>Email</label>
-
-                <input type="email" id="Email" required>
-
-                <label>Product Type</label>
-
-                <input type="text" id="ProductType" required>
+                <label for="ProductType">Product Type</label>
+                <select id="ProductType" required>
+                    <option value="">Select product type</option>
+                    <option value="Vegetables">Vegetables</option>
+                    <option value="Fruits">Fruits</option>
+                    <option value="Dairy">Dairy</option>
+                    <option value="Bakery">Bakery</option>
+                    <option value="Flowers">Flowers</option>
+                    <option value="Honey">Honey</option>
+                    <option value="Crafts">Crafts</option>
+                    <option value="Other">Other</option>
+                </select>
 
                 <button type="submit" id="saveBtn">
                     <i class="fa-solid fa-floppy-disk"></i>
@@ -72,6 +80,15 @@
                     <i class="fa-solid fa-pen"></i>
                     Update Vendor
                 </button>
+
+                <button
+    type="button"
+    id="cancelVendorBtn"
+    onclick="clearForm()"
+    style="display:none;">
+    <i class="fa-solid fa-xmark"></i>
+    Cancel
+</button>
 
             </form>
 

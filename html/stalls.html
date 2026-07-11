@@ -3,142 +3,133 @@
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Stalls</title>
+    <title>Stalls</title>
 
-<link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
 
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
 </head>
 
 <body>
 
-<div class="sidebar">
+    <div class="sidebar">
 
-<h2>🌾 Farmers Market</h2>
+        <h2>🌾 Farmers Market</h2>
 
-<a href="/html/index.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+        <a href="/html/index.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
 
-<a href="/html/vendors.html"><i class="fa-solid fa-users"></i> Vendors</a>
+        <a href="/html/vendors.html"><i class="fa-solid fa-users"></i> Vendors</a>
 
-<a href="/html/stalls.html" class="active"><i class="fa-solid fa-store"></i> Stalls</a>
+        <a href="/html/stalls.html" class="active"><i class="fa-solid fa-store"></i> Stalls</a>
 
-<a href="/html/allocations.html"><i class="fa-solid fa-calendar-days"></i> Allocations</a>
+        <a href="/html/allocations.html"><i class="fa-solid fa-calendar-days"></i> Allocations</a>
 
-<a href="/html/reports.html"><i class="fa-solid fa-file"></i> Reports</a>
+        <a href="/html/reports.html"><i class="fa-solid fa-file"></i> Reports</a>
 
-<a href="/html/login.html"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+        <a href="/html/login.html"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
 
-</div>
+    </div>
 
-<div class="main">
+    <div class="main">
 
-<h1>🏪 Stall Management</h1>
+        <h1>🏪 Stall Management</h1>
 
-<div class="card">
+        <div class="card">
 
-<h2>Add / Update Stall</h2>
+            <h2>Add / Update Stall</h2>
 
-<form id="stallForm">
+            <form id="stallForm" novalidate>
 
-<input type="hidden" id="StallID">
+                <input type="hidden" id="StallID">
 
-<label>Stall Number</label>
+                <label for="StallNumber">Stall Number</label>
+                <input type="text" id="StallNumber" minlength="2" maxlength="10" pattern="[A-Za-z0-9-]{2,10}"
+                    placeholder="Example: A01" required>
 
-<input type="text" id="StallNumber" required>
+                <label for="LocationZone">Location Zone</label>
+                <select id="LocationZone" required>
+                    <option value="">Select Zone</option>
+                    <option value="North">North</option>
+                    <option value="South">South</option>
+                    <option value="East">East</option>
+                    <option value="West">West</option>
+                </select>
 
-<label>Location Zone</label>
+                <label for="RentalFee">Rental Fee</label>
+                <input type="number" id="RentalFee" min="1" max="100000" step="1" placeholder="Enter rental fee" required>
 
-<select id="LocationZone">
+                <label for="Status">Status</label>
+                <select id="Status" required>
+                    <option value="Available">Available</option>
+                    <option value="Occupied">Occupied</option>
+                </select>
 
-<option>North</option>
+                <button type="submit" id="saveStallBtn">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Save Stall
+                </button>
 
-<option>South</option>
+                <button type="button" id="updateStallBtn" onclick="updateStall()" style="display:none;">
+                    <i class="fa-solid fa-pen"></i>
+                    Update Stall
+                </button>
 
-<option>East</option>
+                <button type="button" id="cancelStallBtn" onclick="clearStallForm()" style="display:none;">
+                     <i class="fa-solid fa-xmark"></i>
+                    Cancel
+                </button>
 
-<option>West</option>
+            </form>
+        </div>
 
-</select>
+        <br>
 
-<label>Rental Fee</label>
+        <div class="card">
 
-<input type="number" id="RentalFee" required>
+            <div class="search-box">
 
-<label>Status</label>
+                <input type="text" id="search" placeholder="Search Stall" onkeyup="searchStall()">
 
-<select id="Status">
+            </div>
 
-<option>Available</option>
+            <table>
 
-<option>Occupied</option>
+                <thead>
 
-</select>
+                    <tr>
 
-<button type="submit">
+                        <th>ID</th>
 
-<i class="fa-solid fa-floppy-disk"></i>
+                        <th>Stall</th>
 
-Save Stall
+                        <th>Zone</th>
 
-</button>
+                        <th>Rental</th>
 
-</form>
+                        <th>Status</th>
 
-</div>
+                        <th>Action</th>
 
-<br>
+                    </tr>
 
-<div class="card">
+                </thead>
 
-<div class="search-box">
+                <tbody id="stallTable">
 
-<input
-type="text"
-id="search"
-placeholder="Search Stall"
-onkeyup="searchStall()">
+                </tbody>
 
-</div>
+            </table>
 
-<table>
+        </div>
 
-<thead>
+    </div>
 
-<tr>
-
-<th>ID</th>
-
-<th>Stall</th>
-
-<th>Zone</th>
-
-<th>Rental</th>
-
-<th>Status</th>
-
-<th>Action</th>
-
-</tr>
-
-</thead>
-
-<tbody id="stallTable">
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-<script src="/js/stalls.js"></script>
+    <script src="/js/stalls.js"></script>
 
 </body>
 

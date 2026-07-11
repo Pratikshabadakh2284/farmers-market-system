@@ -41,10 +41,23 @@ function renderVendors(vendors) {
                     <td>${vendor.Phone}</td>
                     <td>${vendor.Email}</td>
                     <td>${vendor.ProductCategory}</td>
-                    <td>
-                        <button type="button" onclick="editVendor(${vendor.VendorID})">Edit</button>
-                        <button type="button" onclick="deleteVendor(${vendor.VendorID})">Delete</button>
-                    </td>
+                   <td class="action-cell">
+    <div class="action-buttons">
+        <button
+            type="button"
+            class="edit-btn"
+            onclick="editVendor(${vendor.VendorID})">
+            Edit
+        </button>
+
+        <button
+            type="button"
+            class="delete-btn"
+            onclick="deleteVendor(${vendor.VendorID})">
+            Delete
+        </button>
+    </div>
+</td>
                 </tr>`;
         });
     }
@@ -60,22 +73,32 @@ async function addVendor() {
         ProductCategory: document.getElementById("ProductType").value.trim()
     };
 
-    if (!vendor.VendorName || !vendor.Phone || !vendor.Email || !vendor.ProductCategory) {
-        alert("Please fill all fields.");
-        return;
+    if (!validateVendor(vendor)) return;
+
+    try {
+        const response = await fetch(API + "/addVendor", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(vendor)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            alert(result.message || "Unable to add vendor.");
+            return;
+        }
+
+        alert(result.message);
+        clearForm();
+        await loadVendors();
+
+    } catch (error) {
+        console.error(error);
+        alert("Unable to connect to the server.");
     }
-
-    const response = await fetch(API + "/addVendor", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(vendor)
-    });
-
-    const result = await response.json();
-    alert(result.message);
-
-    clearForm();
-    loadVendors();
 }
 
 async function editVendor(id) {
@@ -87,12 +110,26 @@ async function editVendor(id) {
     document.getElementById("PhoneNumber").value = vendor.Phone;
     document.getElementById("Email").value = vendor.Email;
     document.getElementById("ProductType").value = vendor.ProductCategory;
+
     document.getElementById("saveBtn").style.display = "none";
     document.getElementById("updateBtn").style.display = "inline-block";
+    document.getElementById("cancelVendorBtn").style.display = "inline-block";
+
+    document.getElementById("vendorForm").scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+    document.getElementById("VendorName").focus();
 }
 
 async function updateVendor() {
     const id = document.getElementById("VendorID").value;
+
+    if (!id) {
+        alert("Please select a vendor to update.");
+        return;
+    }
 
     const vendor = {
         VendorName: document.getElementById("VendorName").value.trim(),
@@ -101,17 +138,32 @@ async function updateVendor() {
         ProductCategory: document.getElementById("ProductType").value.trim()
     };
 
-    const response = await fetch(API + "/updateVendor/" + id, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(vendor)
-    });
+    if (!validateVendor(vendor)) return;
 
-    const result = await response.json();
-    alert(result.message);
+    try {
+        const response = await fetch(API + "/updateVendor/" + id, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(vendor)
+        });
 
-    clearForm();
-    loadVendors();
+        const result = await response.json();
+
+        if (!response.ok) {
+            alert(result.message || "Unable to update vendor.");
+            return;
+        }
+
+        alert(result.message);
+        clearForm();
+        await loadVendors();
+
+    } catch (error) {
+        console.error(error);
+        alert("Unable to connect to the server.");
+    }
 }
 
 async function deleteVendor(id) {
@@ -150,4 +202,34 @@ function clearForm() {
 
     document.getElementById("saveBtn").style.display = "inline-block";
     document.getElementById("updateBtn").style.display = "none";
+    document.getElementById("cancelVendorBtn").style.display = "none";
+
+    document.getElementById("VendorName").focus();
+}
+
+function validateVendor(vendor) {
+    const phoneRegex = /^[0-9]{10}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!vendor.VendorName.trim()) {
+        alert("Vendor name is required.");
+        return false;
+    }
+
+    if (!phoneRegex.test(vendor.Phone)) {
+        alert("Phone number must contain exactly 10 digits.");
+        return false;
+    }
+
+    if (!emailRegex.test(vendor.Email)) {
+        alert("Please enter a valid email address.");
+        return false;
+    }
+
+    if (!vendor.ProductCategory.trim()) {
+        alert("Product category is required.");
+        return false;
+    }
+
+    return true;
 }
