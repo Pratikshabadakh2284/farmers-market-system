@@ -92,3 +92,25 @@ The integration tests cover:
 - Deleting the test vendor
 
 Test data is removed after successful execution.
+
+## Installation and Setup
+
+1. Clone the repository.
+2. Open the project directory.
+3. Install dependencies:
+
+npm install
+
+4. Configure the `.env` file with the SQL Server details.
+5. Ensure SQL Server is running.
+6. Start the application:
+
+npm run dev
+
+7. Open the application in the browser using localhost port 3000.
+
+## Running Automated Tests
+
+Run:
+
+npm test
