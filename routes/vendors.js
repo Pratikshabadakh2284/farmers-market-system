@@ -59,13 +59,18 @@ router.get("/getAllVendors", async (req, res) => {
 /* GET BY ID */
 
 router.get("/getVendor/:id", async (req, res) => {
+
     try {
 
         const pool = await connectDB();
 
         const result = await pool.request()
 
-            .input("VendorID", sql.Int, req.params.id)
+            .input(
+                "VendorID",
+                sql.Int,
+                req.params.id
+            )
 
             .query(`
                 SELECT *
@@ -73,18 +78,29 @@ router.get("/getVendor/:id", async (req, res) => {
                 WHERE VendorID=@VendorID
             `);
 
+
+        if (result.recordset.length === 0) {
+
+            return res.status(404).json(null);
+
+        }
+
+
         res.json(result.recordset[0]);
 
-    } catch (err) {
+    }
+
+    catch (err) {
 
         res.status(500).json({
+
             message: err.message
+
         });
 
     }
 
 });
-
 
 /* ADD */
 
