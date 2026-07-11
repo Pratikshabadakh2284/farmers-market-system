@@ -34,3 +34,27 @@ The purpose of this system is to provide a structured digital solution for manag
 - SQL queries should use parameterised inputs.
 - The application should provide clear success and error messages.
 - The system should maintain consistent data between stalls and allocations.
+
+## Technologies Used
+
+- HTML
+- CSS
+- JavaScript
+- Node.js
+- Express.js
+- Microsoft SQL Server
+- mssql/msnodesqlv8
+
+## System Architecture
+
+The application uses a client-server architecture.
+
+1. The frontend is developed using HTML, CSS and JavaScript.
+2. JavaScript uses the Fetch API to send HTTP requests.
+3. Express.js provides REST API endpoints.
+4. API routes execute parameterised SQL queries.
+5. Microsoft SQL Server stores application data.
+6. JSON responses are returned to the frontend.
+7. JavaScript dynamically updates the user interface.
+
+Frontend → Fetch API → Express Routes → SQL Server
