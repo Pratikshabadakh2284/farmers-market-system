@@ -58,3 +58,37 @@ The application uses a client-server architecture.
 7. JavaScript dynamically updates the user interface.
 
 Frontend → Fetch API → Express Routes → SQL Server
+
+## Testing
+
+The project includes automated unit and integration testing.
+
+### Unit Testing
+
+Unit tests are used to test vendor and stall validation logic independently.
+
+The tests verify:
+
+- Vendor name validation
+- Ten-digit phone number validation
+- Email validation
+- Product category validation
+- Stall number validation
+- Rental fee limits
+- Location zone validation
+- Stall status validation
+
+The built-in Node.js test runner is used to execute the tests.
+
+### Integration Testing
+
+Vendor CRUD API integration tests verify communication between the HTTP API, Express routes and SQL Server database.
+
+The integration tests cover:
+
+- Creating a vendor
+- Retrieving the created vendor
+- Updating the vendor
+- Deleting the test vendor
+
+Test data is removed after successful execution.
