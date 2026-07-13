@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-
+const { initialiseDatabase } = require("./db/initDatabase");
 const { connectDB } = require("./db/database");
 
 const vendorRoutes = require("./routes/vendors");
@@ -62,16 +62,20 @@ app.get("/", (req, res) => {
    START SERVER
 ========================= */
 
-const PORT = 3000;
+//const PORT = 3000;
+
+const PORT = process.env.PORT || 3000;
 
 async function startServer() {
 
-    await connectDB();
+    connectDB();
+
+    initialiseDatabase();
 
     app.listen(PORT, () => {
 
         console.log(
-            `Server running on http://localhost:${PORT}`
+            `Server running on port ${PORT}`
         );
 
     });

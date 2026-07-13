@@ -1,22 +1,20 @@
-require("dotenv").config();
-const sql = require("mssql/msnodesqlv8");
+const Database = require("better-sqlite3");
+const path = require("node:path");
 
-const config = {
-    connectionString: `Driver={ODBC Driver 17 for SQL Server};Server=${process.env.DB_SERVER};Database=${process.env.DB_DATABASE};Trusted_Connection=Yes;`
-};
+const databasePath =
+    process.env.DB_PATH ||
+    path.join(__dirname, "farmers-market.db");
 
-async function connectDB() {
-    try {
-        const pool = await sql.connect(config);
-        console.log("SQL Server Connected Successfully");
-        return pool;
-    } catch (err) {
-        console.error("Database Connection Failed");
-        console.error(err);
-    }
+const db = new Database(databasePath);
+
+db.pragma("foreign_keys = ON");
+
+function connectDB() {
+    console.log("SQLite Database Connected Successfully");
+    return db;
 }
 
 module.exports = {
-    sql,
+    db,
     connectDB
 };

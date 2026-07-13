@@ -1,94 +1,93 @@
 const express = require("express");
+
 const router = express.Router();
-const { sql, connectDB } = require("../db/database");
 
-/* SEARCH STALL */
+const {
+    db
+} = require("../db/database");
 
-router.get("/searchStall/:stall", async (req, res) => {
+
+router.get("/searchStall/:stall", (req, res) => {
 
     try {
 
-        const pool = await connectDB();
+        const stalls = db.prepare(`
+            SELECT *
+            FROM Stalls
+            WHERE StallNumber LIKE ?
+        `).all(
+            `%${req.params.stall}%`
+        );
 
-        const result = await pool.request()
-
-            .input("search", sql.VarChar, "%" + req.params.stall + "%")
-
-            .query(`
-                SELECT *
-                FROM Stalls
-                WHERE StallNumber LIKE @search
-            `);
-
-        res.json(result.recordset);
+        res.json(stalls);
 
     } catch (err) {
 
-        res.status(500).json({ message: err.message });
+        res.status(500).json({
+            message: "Unable to search stalls."
+        });
 
     }
 
 });
 
 
-/* GET ALL STALLS */
+router.get("/getAllStalls", (req, res) => {
 
-router.get("/getAllStalls", async (req, res) => {
     try {
 
-        const pool = await connectDB();
+        const stalls = db.prepare(`
+            SELECT *
+            FROM Stalls
+            ORDER BY StallID DESC
+        `).all();
 
-        const result = await pool.request()
-
-            .query(`
-                SELECT *
-                FROM Stalls
-                ORDER BY StallID DESC
-            `);
-
-        res.json(result.recordset);
+        res.json(stalls);
 
     } catch (err) {
 
-        res.status(500).json({ message: err.message });
+        res.status(500).json({
+            message: "Unable to load stalls."
+        });
 
     }
 
 });
 
 
-/* GET STALL BY ID */
+router.get("/getStall/:id", (req, res) => {
 
-router.get("/getStall/:id", async (req, res) => {
     try {
 
-        const pool = await connectDB();
+        const stall = db.prepare(`
+            SELECT *
+            FROM Stalls
+            WHERE StallID = ?
+        `).get(req.params.id);
 
-        const result = await pool.request()
+        if (!stall) {
 
-            .input("StallID", sql.Int, req.params.id)
+            return res.status(404).json(null);
 
-            .query(`
-                SELECT *
-                FROM Stalls
-                WHERE StallID=@StallID
-            `);
+        }
 
-        res.json(result.recordset[0]);
+        res.json(stall);
 
     } catch (err) {
 
-        res.status(500).json({ message: err.message });
+        res.status(500).json({
+            message: "Unable to load stall."
+        });
 
     }
 
 });
 
 
-/* ADD STALL */
+router.post("/addStall", (req, res) => {
 
-router.post("/addStall", async (req, res) => {
     try {
+
         const {
             StallNumber,
             LocationZone,
@@ -96,114 +95,116 @@ router.post("/addStall", async (req, res) => {
             Status
         } = req.body;
 
-        if (!StallNumber || !LocationZone || !RentalFee || !Status) {
-            return res.status(400).json({
-                message: "Please fill all required fields."
-            });
-        }
+        const existingStall = db.prepare(`
+            SELECT StallID
+            FROM Stalls
+            WHERE StallNumber = ?
+        `).get(StallNumber);
 
-        const pool = await connectDB();
+        if (existingStall) {
 
-        const check = await pool.request()
-            .input("StallNumber", sql.VarChar, StallNumber)
-            .query(`
-                SELECT *
-                FROM Stalls
-                WHERE StallNumber = @StallNumber
-            `);
-
-        if (check.recordset.length > 0) {
             return res.status(400).json({
                 message: "Stall Number already exists."
             });
+
         }
 
-        await pool.request()
-            .input("StallNumber", sql.VarChar, StallNumber)
-            .input("LocationZone", sql.VarChar, LocationZone)
-            .input("RentalFee", sql.Decimal(10, 2), RentalFee)
-            .input("Status", sql.VarChar, Status)
-            .query(`
-                INSERT INTO Stalls
-                (
-                    StallNumber,
-                    LocationZone,
-                    RentalFee,
-                    Status
-                )
-                VALUES
-                (
-                    @StallNumber,
-                    @LocationZone,
-                    @RentalFee,
-                    @Status
-                )
-            `);
+        db.prepare(`
+            INSERT INTO Stalls
+            (
+                StallNumber,
+                LocationZone,
+                RentalFee,
+                Status
+            )
+            VALUES (?, ?, ?, ?)
+        `).run(
+            StallNumber,
+            LocationZone,
+            RentalFee,
+            Status
+        );
 
         res.status(201).json({
             message: "Stall Added Successfully"
         });
 
     } catch (err) {
+
+        console.error(err);
+
         res.status(500).json({
-            message: err.message
+            message: "Unable to add stall."
         });
+
     }
+
 });
 
 
-/* UPDATE STALL */
-
-router.put("/updateStall/:id", async (req, res) => {
+router.put("/updateStall/:id", (req, res) => {
 
     try {
 
         const {
-
             StallNumber,
             LocationZone,
             RentalFee,
             Status
-
         } = req.body;
 
-        const pool = await connectDB();
+        const duplicate = db.prepare(`
+            SELECT StallID
+            FROM Stalls
+            WHERE StallNumber = ?
+              AND StallID != ?
+        `).get(
+            StallNumber,
+            req.params.id
+        );
 
-        await pool.request()
+        if (duplicate) {
 
-            .input("StallID", sql.Int, req.params.id)
-            .input("StallNumber", sql.VarChar, StallNumber)
-            .input("LocationZone", sql.VarChar, LocationZone)
-            .input("RentalFee", sql.Decimal(10, 2), RentalFee)
-            .input("Status", sql.VarChar, Status)
+            return res.status(400).json({
+                message: "Stall Number already exists."
+            });
 
-            .query(`
+        }
 
-                UPDATE Stalls
+        const result = db.prepare(`
+            UPDATE Stalls
 
-                SET
+            SET
+                StallNumber = ?,
+                LocationZone = ?,
+                RentalFee = ?,
+                Status = ?
 
-                StallNumber=@StallNumber,
-                LocationZone=@LocationZone,
-                RentalFee=@RentalFee,
-                Status=@Status
+            WHERE StallID = ?
+        `).run(
+            StallNumber,
+            LocationZone,
+            RentalFee,
+            Status,
+            req.params.id
+        );
 
-                WHERE StallID=@StallID
+        if (result.changes === 0) {
 
-            `);
+            return res.status(404).json({
+                message: "Stall not found."
+            });
+
+        }
 
         res.json({
-
             message: "Stall Updated Successfully"
-
         });
 
     } catch (err) {
 
         res.status(500).json({
-
-            message: err.message
-
+            message: "Unable to update stall."
         });
 
     }
@@ -211,53 +212,50 @@ router.put("/updateStall/:id", async (req, res) => {
 });
 
 
-/* DELETE STALL */
+router.delete("/deleteStall/:id", (req, res) => {
 
-router.delete("/deleteStall/:id", async (req, res) => {
     try {
 
-        const pool = await connectDB();
-        const allocation = await pool.request()
-            .input("StallID", sql.Int, req.params.id)
-            .query(`
-        SELECT *
-        FROM Allocations
-        WHERE StallID = @StallID
-    `);
+        const allocation = db.prepare(`
+            SELECT AllocationID
+            FROM Allocations
+            WHERE StallID = ?
+        `).get(req.params.id);
 
-        if (allocation.recordset.length > 0) {
+        if (allocation) {
+
             return res.status(400).json({
                 message: "Cannot delete. Stall is allocated."
             });
+
         }
-        await pool.request()
 
-            .input("StallID", sql.Int, req.params.id)
+        const result = db.prepare(`
+            DELETE FROM Stalls
+            WHERE StallID = ?
+        `).run(req.params.id);
 
-            .query(`
+        if (result.changes === 0) {
 
-                DELETE
-                FROM Stalls
-                WHERE StallID=@StallID
+            return res.status(404).json({
+                message: "Stall not found."
+            });
 
-            `);
+        }
 
         res.json({
-
             message: "Stall Deleted Successfully"
-
         });
 
     } catch (err) {
 
         res.status(500).json({
-
-            message: err.message
-
+            message: "Unable to delete stall."
         });
 
     }
 
 });
+
 
 module.exports = router;

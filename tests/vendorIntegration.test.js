@@ -2,8 +2,6 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 
 const app = require("../server");
-const { sql } = require("../db/database");
-
 let server;
 let baseURL;
 let createdVendorID;
@@ -24,15 +22,16 @@ test.before(async () => {
 
 
 test.after(async () => {
+
     if (server) {
+
         await new Promise(resolve => {
             server.close(resolve);
         });
+
     }
 
-    await sql.close();
 });
-
 
 // CREATE VENDOR TEST
 

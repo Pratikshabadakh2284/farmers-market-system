@@ -1,38 +1,90 @@
 const express = require("express");
+
 const router = express.Router();
-const { sql, connectDB } = require("../db/database");
 
-/* ===================================================
-   GET ALL ALLOCATIONS
-=================================================== */
+const {
+    db
+} = require("../db/database");
 
-router.get("/getAllAllocations", async (req, res) => {
+
+router.get("/vendors", (req, res) => {
 
     try {
 
-        const pool = await connectDB();
+        const vendors = db.prepare(`
+            SELECT VendorID, VendorName
+            FROM Vendors
+            ORDER BY VendorName
+        `).all();
 
-        const result = await pool.request().query(`
+        res.json(vendors);
+
+    } catch (err) {
+
+        res.status(500).json({
+            message: "Unable to load vendors."
+        });
+
+    }
+
+});
+
+
+router.get("/availableStalls", (req, res) => {
+
+    try {
+
+        const stalls = db.prepare(`
+            SELECT *
+            FROM Stalls
+            WHERE Status = 'Available'
+            ORDER BY StallNumber
+        `).all();
+
+        res.json(stalls);
+
+    } catch (err) {
+
+        res.status(500).json({
+            message: "Unable to load available stalls."
+        });
+
+    }
+
+});
+
+
+router.get("/getAllAllocations", (req, res) => {
+
+    try {
+
+        const allocations = db.prepare(`
             SELECT
                 A.AllocationID,
                 V.VendorName,
                 S.StallNumber,
                 S.LocationZone,
                 A.MarketDate
+
             FROM Allocations A
+
             INNER JOIN Vendors V
                 ON A.VendorID = V.VendorID
+
             INNER JOIN Stalls S
                 ON A.StallID = S.StallID
-            ORDER BY A.AllocationID DESC
-        `);
 
-        res.json(result.recordset);
+            ORDER BY A.AllocationID DESC
+        `).all();
+
+        res.json(allocations);
 
     } catch (err) {
 
+        console.error(err);
+
         res.status(500).json({
-            message: err.message
+            message: "Unable to load allocations."
         });
 
     }
@@ -40,162 +92,102 @@ router.get("/getAllAllocations", async (req, res) => {
 });
 
 
-/* ===================================================
-   LOAD VENDORS
-=================================================== */
-
-router.get("/vendors", async (req, res) => {
-
-    try {
-
-        const pool = await connectDB();
-
-        const result = await pool.request().query(`
-            SELECT VendorID, VendorName
-            FROM Vendors
-            ORDER BY VendorName
-        `);
-
-        res.json(result.recordset);
-
-    }
-
-    catch (err) {
-
-        res.status(500).json({
-            message: err.message
-        });
-
-    }
-
-});
-
-
-/* ===================================================
-   LOAD AVAILABLE STALLS
-=================================================== */
-
-router.get("/availableStalls", async (req, res) => {
-
-    try {
-
-        const pool = await connectDB();
-
-        const result = await pool.request().query(`
-            SELECT
-                StallID,
-                StallNumber,
-                LocationZone
-            FROM Stalls
-            WHERE Status='Available'
-            ORDER BY StallNumber
-        `);
-
-        res.json(result.recordset);
-
-    }
-
-    catch (err) {
-
-        res.status(500).json({
-            message: err.message
-        });
-
-    }
-
-});
-
-
-/* ===================================================
-   ADD ALLOCATION
-=================================================== */
-
-router.post("/addAllocation", async (req, res) => {
+router.post("/addAllocation", (req, res) => {
 
     try {
 
         const {
-
             VendorID,
             StallID,
             MarketDate
-
         } = req.body;
 
-        const pool = await connectDB();
-
-        // Check if stall is already allocated
-
-        const check = await pool.request()
-
-            .input("StallID", sql.Int, StallID)
-
-            .query(`
-                SELECT *
-                FROM Allocations
-                WHERE StallID=@StallID
-            `);
-
-        if (check.recordset.length > 0) {
+        if (!VendorID || !StallID || !MarketDate) {
 
             return res.status(400).json({
-
-                message: "This stall is already allocated."
-
+                message:
+                    "Vendor, stall and market date are required."
             });
 
         }
 
-        // Insert Allocation
+        const stall = db.prepare(`
+            SELECT *
+            FROM Stalls
+            WHERE StallID = ?
+        `).get(StallID);
 
-        await pool.request()
+        if (!stall) {
 
-            .input("VendorID", sql.Int, VendorID)
-            .input("StallID", sql.Int, StallID)
-            .input("MarketDate", sql.Date, MarketDate)
+            return res.status(404).json({
+                message: "Stall not found."
+            });
 
-            .query(`
+        }
+
+        if (stall.Status !== "Available") {
+
+            return res.status(400).json({
+                message: "Selected stall is not available."
+            });
+
+        }
+
+        const vendorAllocation = db.prepare(`
+            SELECT AllocationID
+            FROM Allocations
+            WHERE VendorID = ?
+              AND MarketDate = ?
+        `).get(
+            VendorID,
+            MarketDate
+        );
+
+        if (vendorAllocation) {
+
+            return res.status(400).json({
+                message:
+                    "Vendor already has an allocation for this date."
+            });
+
+        }
+
+        const createAllocation = db.transaction(() => {
+
+            db.prepare(`
                 INSERT INTO Allocations
                 (
                     VendorID,
                     StallID,
                     MarketDate
                 )
+                VALUES (?, ?, ?)
+            `).run(
+                VendorID,
+                StallID,
+                MarketDate
+            );
 
-                VALUES
-                (
-                    @VendorID,
-                    @StallID,
-                    @MarketDate
-                )
-            `);
-
-        // Update Stall Status
-
-        await pool.request()
-
-            .input("StallID", sql.Int, StallID)
-
-            .query(`
+            db.prepare(`
                 UPDATE Stalls
-                SET Status='Occupied'
-                WHERE StallID=@StallID
-            `);
-
-        res.json({
-
-            message: "Stall Allocated Successfully"
+                SET Status = 'Occupied'
+                WHERE StallID = ?
+            `).run(StallID);
 
         });
 
-    }
+        createAllocation();
 
-    catch (err) {
+        res.status(201).json({
+            message: "Stall allocated successfully."
+        });
+
+    } catch (err) {
+
+        console.error(err);
 
         res.status(500).json({
-
-            message: err.message
-
+            message: "Unable to create allocation."
         });
 
     }
@@ -203,78 +195,51 @@ router.post("/addAllocation", async (req, res) => {
 });
 
 
-/* ===================================================
-   DELETE ALLOCATION
-=================================================== */
-
-router.delete("/deleteAllocation/:id", async (req, res) => {
+router.delete("/deleteAllocation/:id", (req, res) => {
 
     try {
 
-        const pool = await connectDB();
+        const allocation = db.prepare(`
+            SELECT *
+            FROM Allocations
+            WHERE AllocationID = ?
+        `).get(req.params.id);
 
-        // Find Stall
-
-        const stall = await pool.request()
-
-            .input("AllocationID", sql.Int, req.params.id)
-
-            .query(`
-                SELECT StallID
-                FROM Allocations
-                WHERE AllocationID=@AllocationID
-            `);
-
-        if (stall.recordset.length === 0) {
+        if (!allocation) {
 
             return res.status(404).json({
-
-                message: "Allocation Not Found"
-
+                message: "Allocation not found."
             });
 
         }
 
-        const stallID = stall.recordset[0].StallID;
+        const removeAllocation = db.transaction(() => {
 
-        // Delete Allocation
+            db.prepare(`
+                DELETE FROM Allocations
+                WHERE AllocationID = ?
+            `).run(req.params.id);
 
-        await pool.request()
-
-            .input("AllocationID", sql.Int, req.params.id)
-
-            .query(`
-                DELETE
-                FROM Allocations
-                WHERE AllocationID=@AllocationID
-            `);
-
-        // Make Stall Available Again
-
-        await pool.request()
-
-            .input("StallID", sql.Int, stallID)
-
-            .query(`
+            db.prepare(`
                 UPDATE Stalls
-                SET Status='Available'
-                WHERE StallID=@StallID
-            `);
-
-        res.json({
-
-            message: "Allocation Deleted Successfully"
+                SET Status = 'Available'
+                WHERE StallID = ?
+            `).run(allocation.StallID);
 
         });
 
-    }
+        removeAllocation();
 
-    catch (err) {
+        res.json({
+            message: "Allocation Deleted Successfully"
+        });
+
+    } catch (err) {
+
+        console.error(err);
 
         res.status(500).json({
-
-            message: err.message
-
+            message: "Unable to delete allocation."
         });
 
     }
@@ -282,50 +247,44 @@ router.delete("/deleteAllocation/:id", async (req, res) => {
 });
 
 
-/* ===================================================
-   SEARCH ALLOCATION
-=================================================== */
-
-router.get("/searchAllocation/:vendor", async (req, res) => {
+router.get("/searchAllocation/:text", (req, res) => {
 
     try {
 
-        const pool = await connectDB();
+        const allocations = db.prepare(`
+            SELECT
+                A.AllocationID,
+                V.VendorName,
+                S.StallNumber,
+                S.LocationZone,
+                A.MarketDate
 
-        const result = await pool.request()
+            FROM Allocations A
 
-            .input("search", sql.VarChar, "%" + req.params.vendor + "%")
+            INNER JOIN Vendors V
+                ON A.VendorID = V.VendorID
 
-            .query(`
-                SELECT
-                    A.AllocationID,
-                    V.VendorName,
-                    S.StallNumber,
-                    S.LocationZone,
-                    A.MarketDate
-                FROM Allocations A
-                INNER JOIN Vendors V
-                    ON A.VendorID = V.VendorID
-                INNER JOIN Stalls S
-                    ON A.StallID = S.StallID
-                WHERE V.VendorName LIKE @search
-                ORDER BY A.AllocationID DESC
-            `);
+            INNER JOIN Stalls S
+                ON A.StallID = S.StallID
 
-        res.json(result.recordset);
+            WHERE V.VendorName LIKE ?
 
-    }
+            ORDER BY A.AllocationID DESC
+        `).all(
+            `%${req.params.text}%`
+        );
 
-    catch (err) {
+        res.json(allocations);
+
+    } catch (err) {
 
         res.status(500).json({
-
-            message: err.message
-
+            message: "Unable to search allocations."
         });
 
     }
 
 });
+
 
 module.exports = router;

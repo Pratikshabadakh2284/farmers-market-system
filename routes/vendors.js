@@ -1,27 +1,34 @@
 const express = require("express");
-const router = express.Router();
-const { sql, connectDB } = require("../db/database");
 
-/* SEARCH */
-router.get("/searchVendor/:name", async (req, res) => {
+const router = express.Router();
+
+const {
+    db
+} = require("../db/database");
+
+
+/* SEARCH VENDOR */
+
+router.get("/searchVendor/:name", (req, res) => {
+
     try {
 
-        const pool = await connectDB();
+        const vendors = db.prepare(`
+            SELECT *
+            FROM Vendors
+            WHERE VendorName LIKE ?
+        `).all(
+            `%${req.params.name}%`
+        );
 
-        const result = await pool.request()
-            .input("search", sql.VarChar, "%" + req.params.name + "%")
-            .query(`
-                SELECT *
-                FROM Vendors
-                WHERE VendorName LIKE @search
-            `);
-
-        res.json(result.recordset);
+        res.json(vendors);
 
     } catch (err) {
 
+        console.error(err);
+
         res.status(500).json({
-            message: err.message
+            message: "Unable to search vendors."
         });
 
     }
@@ -29,26 +36,26 @@ router.get("/searchVendor/:name", async (req, res) => {
 });
 
 
-/* GET ALL */
+/* GET ALL VENDORS */
 
-router.get("/getAllVendors", async (req, res) => {
+router.get("/getAllVendors", (req, res) => {
 
     try {
 
-        const pool = await connectDB();
-
-        const result = await pool.request().query(`
+        const vendors = db.prepare(`
             SELECT *
             FROM Vendors
             ORDER BY VendorID DESC
-        `);
+        `).all();
 
-        res.json(result.recordset);
+        res.json(vendors);
 
     } catch (err) {
 
+        console.error(err);
+
         res.status(500).json({
-            message: err.message
+            message: "Unable to load vendors."
         });
 
     }
@@ -56,55 +63,43 @@ router.get("/getAllVendors", async (req, res) => {
 });
 
 
-/* GET BY ID */
+/* GET VENDOR */
 
-router.get("/getVendor/:id", async (req, res) => {
+router.get("/getVendor/:id", (req, res) => {
 
     try {
 
-        const pool = await connectDB();
+        const vendor = db.prepare(`
+            SELECT *
+            FROM Vendors
+            WHERE VendorID = ?
+        `).get(req.params.id);
 
-        const result = await pool.request()
-
-            .input(
-                "VendorID",
-                sql.Int,
-                req.params.id
-            )
-
-            .query(`
-                SELECT *
-                FROM Vendors
-                WHERE VendorID=@VendorID
-            `);
-
-
-        if (result.recordset.length === 0) {
+        if (!vendor) {
 
             return res.status(404).json(null);
 
         }
 
+        res.json(vendor);
 
-        res.json(result.recordset[0]);
+    } catch (err) {
 
-    }
-
-    catch (err) {
+        console.error(err);
 
         res.status(500).json({
-
-            message: err.message
-
+            message: "Unable to load vendor."
         });
 
     }
 
 });
 
-/* ADD */
 
-router.post("/addVendor", async (req, res) => {
+/* ADD VENDOR */
+
+router.post("/addVendor", (req, res) => {
+
     try {
 
         const {
@@ -114,47 +109,32 @@ router.post("/addVendor", async (req, res) => {
             ProductCategory
         } = req.body;
 
-        const pool = await connectDB();
-
-        await pool.request()
-
-            .input("VendorName", sql.VarChar, VendorName)
-            .input("Phone", sql.VarChar, Phone)
-            .input("Email", sql.VarChar, Email)
-            .input("ProductCategory", sql.VarChar, ProductCategory)
-
-            .query(`
-
-                INSERT INTO Vendors
-                (
-                    VendorName,
-                    Phone,
-                    Email,
-                    ProductCategory
-                )
-
-                VALUES
-                (
-                    @VendorName,
-                    @Phone,
-                    @Email,
-                    @ProductCategory
-                )
-
-            `);
+        db.prepare(`
+            INSERT INTO Vendors
+            (
+                VendorName,
+                Phone,
+                Email,
+                ProductCategory
+            )
+            VALUES (?, ?, ?, ?)
+        `).run(
+            VendorName,
+            Phone,
+            Email,
+            ProductCategory
+        );
 
         res.status(201).json({
-
             message: "Vendor Added Successfully"
-
         });
 
     } catch (err) {
 
+        console.error(err);
+
         res.status(500).json({
-
-            message: err.message
-
+            message: "Unable to add vendor."
         });
 
     }
@@ -162,104 +142,38 @@ router.post("/addVendor", async (req, res) => {
 });
 
 
-/* UPDATE */
+/* UPDATE VENDOR */
 
-router.put("/updateVendor/:id", async (req, res) => {
+router.put("/updateVendor/:id", (req, res) => {
+
     try {
 
         const {
-
             VendorName,
             Phone,
             Email,
             ProductCategory
-
         } = req.body;
 
-        const pool = await connectDB();
+        const result = db.prepare(`
+            UPDATE Vendors
 
-        await pool.request()
+            SET
+                VendorName = ?,
+                Phone = ?,
+                Email = ?,
+                ProductCategory = ?
 
-            .input("VendorID", sql.Int, req.params.id)
-            .input("VendorName", sql.VarChar, VendorName)
-            .input("Phone", sql.VarChar, Phone)
-            .input("Email", sql.VarChar, Email)
-            .input("ProductCategory", sql.VarChar, ProductCategory)
+            WHERE VendorID = ?
+        `).run(
+            VendorName,
+            Phone,
+            Email,
+            ProductCategory,
+            req.params.id
+        );
 
-            .query(`
-
-                UPDATE Vendors
-
-                SET
-
-                VendorName=@VendorName,
-                Phone=@Phone,
-                Email=@Email,
-                ProductCategory=@ProductCategory
-
-                WHERE VendorID=@VendorID
-
-            `);
-
-        res.json({
-
-            message: "Vendor Updated Successfully"
-
-        });
-
-    } catch (err) {
-
-        res.status(500).json({
-
-            message: err.message
-
-        });
-
-    }
-
-});
-
-
-/* DELETE */
-
-router.delete("/deleteVendor/:id", async (req, res) => {
-
-    try {
-
-        const pool = await connectDB();
-
-        const vendorID = req.params.id;
-
-        // Check whether vendor has an allocation
-        const allocation = await pool.request()
-
-            .input("VendorID", sql.Int, vendorID)
-
-            .query(`
-                SELECT AllocationID
-                FROM Allocations
-                WHERE VendorID = @VendorID
-            `);
-
-        if (allocation.recordset.length > 0) {
-
-            return res.status(400).json({
-                message: "Cannot delete vendor. Vendor has an active stall allocation."
-            });
-
-        }
-
-        // Delete vendor
-        const result = await pool.request()
-
-            .input("VendorID", sql.Int, vendorID)
-
-            .query(`
-                DELETE FROM Vendors
-                WHERE VendorID = @VendorID
-            `);
-
-        if (result.rowsAffected[0] === 0) {
+        if (result.changes === 0) {
 
             return res.status(404).json({
                 message: "Vendor not found."
@@ -267,13 +181,64 @@ router.delete("/deleteVendor/:id", async (req, res) => {
 
         }
 
-        res.status(200).json({
+        res.json({
+            message: "Vendor Updated Successfully"
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            message: "Unable to update vendor."
+        });
+
+    }
+
+});
+
+
+/* DELETE VENDOR */
+
+router.delete("/deleteVendor/:id", (req, res) => {
+
+    try {
+
+        const allocation = db.prepare(`
+            SELECT AllocationID
+            FROM Allocations
+            WHERE VendorID = ?
+        `).get(req.params.id);
+
+        if (allocation) {
+
+            return res.status(400).json({
+                message:
+                    "Cannot delete vendor. Vendor has an active stall allocation."
+            });
+
+        }
+
+        const result = db.prepare(`
+            DELETE FROM Vendors
+            WHERE VendorID = ?
+        `).run(req.params.id);
+
+        if (result.changes === 0) {
+
+            return res.status(404).json({
+                message: "Vendor not found."
+            });
+
+        }
+
+        res.json({
             message: "Vendor Deleted Successfully"
         });
 
     } catch (err) {
 
-        console.error("Delete vendor error:", err.message);
+        console.error(err);
 
         res.status(500).json({
             message: "Unable to delete vendor."
@@ -282,5 +247,6 @@ router.delete("/deleteVendor/:id", async (req, res) => {
     }
 
 });
+
 
 module.exports = router;
