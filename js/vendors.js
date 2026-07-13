@@ -1,4 +1,4 @@
-const API = "http://localhost:3000/api/vendors";
+const API = "/api/vendors";
 
 window.onload = function () {
     loadVendors();

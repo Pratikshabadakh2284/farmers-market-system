@@ -1,4 +1,4 @@
-const API = "http://localhost:3000/api/allocations";
+const API = "/api/allocations";
 
 /* ===========================
    PAGE LOAD
@@ -20,24 +20,37 @@ window.onload = () => {
 /* ===========================
    LOAD VENDORS
 =========================== */
-
 async function loadVendors() {
 
     const response = await fetch(API + "/vendors");
 
     const vendors = await response.json();
 
-    let html = '<option value="">Select Vendor</option>';
+    let html = "";
 
-    vendors.forEach(v => {
+    if (vendors.length === 0) {
 
-        html += `
-            <option value="${v.VendorID}">
-                ${v.VendorName}
+        html = `
+            <option value="" disabled selected>
+                No vendors found
             </option>
         `;
 
-    });
+    } else {
+
+        html = '<option value="">Select Vendor</option>';
+
+        vendors.forEach(v => {
+
+            html += `
+                <option value="${v.VendorID}">
+                    ${v.VendorName}
+                </option>
+            `;
+
+        });
+
+    }
 
     document.getElementById("vendor").innerHTML = html;
 
@@ -57,21 +70,28 @@ async function loadAvailableStalls() {
     let html = '<option value="">Select Stall</option>';
 
     if (stalls?.length === 0) {
-        html = renderMessageRow("No available stalls found.");
-    }
-    else {
-        stalls?.forEach(s => {
 
-            html += `
-            <option value="${s.StallID}">
-                ${s.StallNumber} (${s.LocationZone})
+        html = `
+            <option value="" disabled selected>
+                No available stalls found
             </option>
         `;
 
-        });
-    }
-    document.getElementById("stall").innerHTML = html;
+    } else {
 
+        stalls?.forEach(s => {
+
+            html += `
+                <option value="${s.StallID}">
+                    ${s.StallNumber} (${s.LocationZone})
+                </option>
+            `;
+
+        });
+
+    }
+
+    document.getElementById("stall").innerHTML = html;
 }
 
 

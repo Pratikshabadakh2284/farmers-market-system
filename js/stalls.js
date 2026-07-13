@@ -1,4 +1,4 @@
-const api = "http://localhost:3000/api/stalls";
+const api = "/api/stalls";
 
 window.onload = function () {
     loadStalls();
