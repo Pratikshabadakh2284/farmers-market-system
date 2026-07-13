@@ -47,4 +47,14 @@ function logout() {
     window.location.replace("/");
 }
 
+function renderMessageRow(message, colspan = 6) {
+    return `
+        <tr>
+            <td colspan="${colspan}" class="table-message">
+                ${message}
+            </td>
+        </tr>
+    `;
+}
+
 document.addEventListener("DOMContentLoaded", loadSidebar);

@@ -223,39 +223,64 @@ router.put("/updateVendor/:id", async (req, res) => {
 /* DELETE */
 
 router.delete("/deleteVendor/:id", async (req, res) => {
+
     try {
 
         const pool = await connectDB();
 
-        await pool.request()
+        const vendorID = req.params.id;
 
-            .input("VendorID", sql.Int, req.params.id)
+        // Check whether vendor has an allocation
+        const allocation = await pool.request()
+
+            .input("VendorID", sql.Int, vendorID)
 
             .query(`
-
-                DELETE
-                FROM Vendors
-                WHERE VendorID=@VendorID
-
+                SELECT AllocationID
+                FROM Allocations
+                WHERE VendorID = @VendorID
             `);
 
-        res.json({
+        if (allocation.recordset.length > 0) {
 
+            return res.status(400).json({
+                message: "Cannot delete vendor. Vendor has an active stall allocation."
+            });
+
+        }
+
+        // Delete vendor
+        const result = await pool.request()
+
+            .input("VendorID", sql.Int, vendorID)
+
+            .query(`
+                DELETE FROM Vendors
+                WHERE VendorID = @VendorID
+            `);
+
+        if (result.rowsAffected[0] === 0) {
+
+            return res.status(404).json({
+                message: "Vendor not found."
+            });
+
+        }
+
+        res.status(200).json({
             message: "Vendor Deleted Successfully"
-
         });
 
     } catch (err) {
 
+        console.error("Delete vendor error:", err.message);
+
         res.status(500).json({
-
-            message: err.message
-
+            message: "Unable to delete vendor."
         });
 
     }
 
 });
-
 
 module.exports = router;

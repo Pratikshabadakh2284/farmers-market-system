@@ -26,12 +26,7 @@ function renderVendors(vendors) {
     let rows = "";
 
     if (vendors.length === 0) {
-        rows = `
-            <tr>
-                <td colspan="6" style="text-align:center;color:red;font-weight:bold;">
-                    No records found.
-                </td>
-            </tr>`;
+        rows = renderMessageRow("No vendors found.");
     } else {
         vendors.forEach(vendor => {
             rows += `

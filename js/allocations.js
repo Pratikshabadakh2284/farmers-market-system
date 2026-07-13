@@ -56,16 +56,20 @@ async function loadAvailableStalls() {
 
     let html = '<option value="">Select Stall</option>';
 
-    stalls.forEach(s => {
+    if (stalls?.length === 0) {
+        html = renderMessageRow("No available stalls found.");
+    }
+    else {
+        stalls?.forEach(s => {
 
-        html += `
+            html += `
             <option value="${s.StallID}">
                 ${s.StallNumber} (${s.LocationZone})
             </option>
         `;
 
-    });
-
+        });
+    }
     document.getElementById("stall").innerHTML = html;
 
 }
@@ -83,21 +87,9 @@ async function loadAllocations() {
 
     let html = "";
 
-    if (data.length === 0) {
-
-        html = `
-            <tr>
-
-                <td colspan="6">
-
-                    No Allocations Found
-
-                </td>
-
-            </tr>
-        `;
-
-    }
+   if (data?.length === 0) {
+    rows = renderMessageRow("No vendors found.");
+   }
 
     else {
 
@@ -115,7 +107,7 @@ async function loadAllocations() {
 
                 <td>${a.LocationZone}</td>
 
-                <td>${a.MarketDate.substring(0,10)}</td>
+                <td>${a.MarketDate.substring(0, 10)}</td>
 
                 <td>
 
@@ -233,22 +225,8 @@ async function searchAllocation() {
 
     let html = "";
 
-    if (data.length === 0) {
-
-        html = `
-
-            <tr>
-
-                <td colspan="6">
-
-                    No Records Found
-
-                </td>
-
-            </tr>
-
-        `;
-
+    if (data?.length === 0) {
+        rows = renderMessageRow("No vendors found.");
     }
 
     else {
@@ -267,7 +245,7 @@ async function searchAllocation() {
 
                 <td>${a.LocationZone}</td>
 
-                <td>${a.MarketDate.substring(0,10)}</td>
+                <td>${a.MarketDate.substring(0, 10)}</td>
 
                 <td>
 

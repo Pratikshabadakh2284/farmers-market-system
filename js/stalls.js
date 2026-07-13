@@ -25,10 +25,10 @@ async function loadStalls() {
 function renderStalls(data) {
     let html = "";
 
-    if (data.length === 0) {
-        html = `<tr><td colspan="6">No Stall Found</td></tr>`;
+    if (data?.length === 0) {
+        html = renderMessageRow("No stalls found.");
     } else {
-        data.forEach(stall => {
+        data?.forEach(stall => {
             html += `
             <tr>
                 <td>${stall.StallID}</td>
