@@ -2,7 +2,6 @@ const STALL_API =
     "/api/stalls";
 
 
-
 window.initStalls =
     function () {
 
