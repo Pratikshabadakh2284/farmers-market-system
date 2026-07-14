@@ -8,30 +8,60 @@ Submission Date: July 14, 2026
 
 # Farmers Market Management System
 
+## Live Application
+
+**Live Application:**\
+https://farmers-market-system-production.up.railway.app/html/login.html
+
+The Farmers Market Management System is deployed on Railway. The final
+application uses Node.js, Express, SQLite, `better-sqlite3`, and Railway
+persistent volume storage.
+
+------------------------------------------------------------------------
+
 ## Project Overview
 
 The Farmers Market Management System is a database-driven web
 application developed to manage vendors, market stalls, and stall
-allocations. The system provides a central interface for an
-administrator to maintain vendor and stall records, assign available
-stalls to vendors, view allocation details, generate reports, and
-monitor market information from a dashboard.
+allocations.
+
+The system provides a central interface for a market administrator to
+maintain vendor and stall records, assign available stalls to vendors,
+view allocation information, generate reports, and monitor market
+activity through a dashboard.
+
+The project is a proof-of-concept information system demonstrating CRUD
+operations, API-based frontend and backend communication, validation,
+relational data management, automated testing, and cloud deployment.
 
 ## Problem Statement
 
-Managing farmers market information manually can lead to duplicate
-records, invalid data, unclear stall availability, and difficulty
-tracking vendor allocations. This project provides a simple management
-system that stores related information in a SQL Server database and
-exposes the required operations through a Node.js and Express API.
+Managing farmers market information manually can result in duplicate
+records, invalid information, unclear stall availability, and difficulty
+tracking vendor allocations.
+
+This system provides a simple web interface where vendor, stall, and
+allocation data can be managed. The frontend communicates with a Node.js
+and Express backend through API calls. The backend applies business
+rules and stores data in a SQLite relational database.
+
+## Selected Organisation
+
+The selected organisation is a small farmers market. A farmers market
+was selected because administrators regularly manage vendor information,
+product categories, stalls, rental fees, stall availability,
+allocations, and market dates.
+
+These requirements provide a suitable scenario for demonstrating CRUD
+operations and relational database relationships.
 
 ## Stakeholders
 
--   **Market Administrator** - manages vendors, stalls, allocations, and
-    reports.
--   **Vendors** - vendor details are stored and vendors are assigned to
-    stalls.
--   **Market Management** - uses system information and reports to
+-   **Market Administrator** - manages vendors, stalls, allocations,
+    reports, and market information.
+-   **Vendors** - vendor details are stored and vendors can be assigned
+    to available stalls.
+-   **Market Management** - uses dashboard information and reports to
     monitor market activity.
 
 ## Functional Requirements
@@ -41,30 +71,33 @@ exposes the required operations through a Node.js and Express API.
 -   Add vendors.
 -   View all vendors.
 -   Search vendors by name.
--   Edit vendor details.
+-   Edit vendor information.
 -   Delete vendors.
 -   Validate vendor name, phone number, email, and product category.
--   Prevent deletion of a vendor who is referenced by an allocation.
+-   Prevent deletion of vendors referenced by an allocation.
 
 ### Stall Management
 
--   Add stalls.
+-   Add market stalls.
 -   View all stalls.
 -   Search stalls.
--   Edit stall details.
+-   Edit stall information.
 -   Delete stalls.
--   Validate stall details and rental fee.
--   Maintain Available and Occupied status.
--   Prevent deletion of an allocated stall.
+-   Validate stall details and rental fees.
+-   Maintain Available and Occupied stall status.
+-   Prevent deletion of allocated stalls.
 
 ### Allocation Management
 
 -   Load vendors into the allocation form.
 -   Display available stalls.
--   Allocate a stall to a vendor for a market date.
+-   Show an empty-state message when records are unavailable.
+-   Allocate an available stall to a vendor.
+-   Store the market date.
 -   View and search allocations.
 -   Delete allocations.
--   Display vendor and stall details using relational SQL joins.
+-   Automatically update stall availability.
+-   Display vendor and stall information using relational joins.
 
 ### Other Features
 
@@ -73,71 +106,74 @@ exposes the required operations through a Node.js and Express API.
 -   Reports.
 -   Shared navigation sidebar.
 -   Logout confirmation.
--   User-friendly validation and error messages.
+-   User-friendly validation and API error messages.
+-   Empty table and dropdown messages.
 
 ## Non-Functional Requirements
 
 -   Simple and understandable user interface.
 -   Clear validation messages.
 -   Reusable code where practical.
--   Parameterised SQL queries.
+-   Parameterised database queries.
 -   Relational data integrity.
 -   Organised project structure.
 -   Automated unit and integration testing.
+-   Public GitHub development history.
+-   Cloud-accessible live application.
 
 ## Technology Stack
 
-  -----------------------------------------------------------------------
-  Technology                          Purpose
-  ----------------------------------- -----------------------------------
-  HTML5                               Page structure
-
-  CSS3                                Styling
-
-  JavaScript                          Frontend logic and DOM manipulation
-
-  Node.js                             Backend runtime
-
-  Express.js                          Server and API routing
-
-  Microsoft SQL Server                Relational database
-
-  mssql / msnodesqlv8                 SQL Server connectivity in the
-                                      current development setup
-
-  dotenv                              Environment configuration
-
-
-  Node.js Test Runner                 Unit and integration tests
-
-  Git and GitHub                      Version control and development
-                                      history
-  -----------------------------------------------------------------------
+  Technology            Purpose
+  --------------------- -----------------------------------------
+  HTML5                 Page structure
+  CSS3                  Styling
+  JavaScript            Frontend logic and DOM manipulation
+  Fetch API             Frontend API communication
+  Node.js               Backend JavaScript runtime
+  Express.js            Server and API routing
+  SQLite                Relational data storage
+  better-sqlite3        SQLite integration with Node.js
+  dotenv                Environment configuration
+  Node.js Test Runner   Unit and integration testing
+  Git and GitHub        Version control and development history
+  Railway               Cloud application deployment
+  Railway Volume        Persistent SQLite storage
 
 ## System Architecture
 
-Browser / Frontend
-        |
-        | Fetch API / HTTP
-        v
+``` text
+User Browser
+     |
+     | HTTPS
+     v
+HTML + CSS + JavaScript Frontend
+     |
+     | Fetch API
+     v
 Node.js + Express API
-        |
-        | Parameterised SQL queries
-        v
-Microsoft SQL Server
+     |
+     | Parameterised SQLite Queries
+     v
+SQLite Relational Database
+     |
+     v
+Railway Persistent Volume
 ```
 
-The frontend is built with HTML, CSS, and JavaScript. Express routes
-process HTTP requests and communicate with SQL Server. SQL Server stores
-vendors, stalls, and allocation relationships.
+The frontend does not directly access the database. JavaScript uses the
+Fetch API to communicate with Express API routes. Express processes HTTP
+requests, applies business rules, and performs SQLite database
+operations.
 
 ## Project Structure
 
-project/
+``` text
+farmers-market-system/
 |-- css/
 |   `-- style.css
 |-- db/
-|   `-- database.js
+|   |-- database.js
+|   `-- initDatabase.js
 |-- html/
 |   |-- index.html
 |   |-- login.html
@@ -158,14 +194,20 @@ project/
 |   `-- dashboard.js
 |-- utils/
 |   `-- validation.js
-|-- test/
-|   `-- automated test files
+|-- tests/
+|   |-- validation test files
+|   `-- vendorIntegration.test.js
+|-- .gitignore
 |-- server.js
 |-- package.json
+|-- package-lock.json
 `-- README.md
 ```
 
 ## Database Design
+
+The final application uses SQLite. The required tables are automatically
+initialised when the application starts.
 
 ### Vendors
 
@@ -190,27 +232,41 @@ project/
 -   `StallID` - Foreign Key referencing Stalls
 -   `MarketDate`
 
+### Users
+
+-   `UserID` - Primary Key
+-   `Username`
+-   `Password`
+-   `Role`
+-   `VendorID`
+
 ### Relationships
 
+``` text
 Vendors                         Stalls
 PK VendorID                     PK StallID
      |                               |
      | FK VendorID                   | FK StallID
-     v                               v
+     +------------+   +--------------+
+                  |   |
+                  v   v
               Allocations
               PK AllocationID
               FK VendorID
               FK StallID
+              MarketDate
 ```
 
-IDs are used internally to identify exact records. Names are displayed
-to users, but names may not be unique and therefore are not used as
-primary keys.
+IDs identify exact records internally. Names are displayed to users but
+are not used as primary keys because names may not be unique.
 
-## Allocation SQL Join
+SQLite foreign key enforcement is enabled with:
 
-The Allocations table stores foreign keys. To display meaningful
-information, the application joins Vendors and Stalls:
+``` javascript
+db.pragma("foreign_keys = ON");
+```
+
+## Allocation Database Join
 
 ``` sql
 SELECT
@@ -227,13 +283,14 @@ INNER JOIN Stalls S
 ORDER BY A.AllocationID DESC;
 ```
 
-This returns vendor names and stall details while maintaining a normal
-relational database structure.
+The join maintains relational IDs while displaying meaningful vendor and
+stall information.
 
 ## Main API Routes
 
 ### Vendors
 
+``` text
 GET    /api/vendors/getAllVendors
 GET    /api/vendors/getVendor/:id
 GET    /api/vendors/searchVendor/:name
@@ -244,6 +301,7 @@ DELETE /api/vendors/deleteVendor/:id
 
 ### Stalls
 
+``` text
 GET    /api/stalls/getAllStalls
 GET    /api/stalls/getStall/:id
 GET    /api/stalls/searchStall/:stall
@@ -254,12 +312,38 @@ DELETE /api/stalls/deleteStall/:id
 
 ### Allocations
 
+``` text
 GET    /api/allocations/vendors
 GET    /api/allocations/availableStalls
 GET    /api/allocations/getAllAllocations
+GET    /api/allocations/searchAllocation/:text
 POST   /api/allocations/addAllocation
 DELETE /api/allocations/deleteAllocation/:id
 ```
+
+### Authentication
+
+``` text
+POST   /api/auth/login
+```
+
+### Dashboard
+
+``` text
+GET    /api/dashboard
+```
+
+## CRUD Operations
+
+  CRUD Operation   HTTP Method   Example
+  ---------------- ------------- -------------------------------------
+  Create           POST          Add vendor, stall, or allocation
+  Read             GET           View and search records
+  Update           PUT           Edit vendor or stall
+  Delete           DELETE        Delete vendor, stall, or allocation
+
+The frontend performs these operations using API requests rather than
+post-and-refresh form submission.
 
 ## Validation
 
@@ -273,36 +357,52 @@ DELETE /api/allocations/deleteAllocation/:id
 ### Stall Validation
 
 -   Stall number is required.
--   Rental fee must be numeric and within the configured limit.
--   Location and status use predefined options.
+-   Rental fee must be numeric and within configured limits.
+-   Location and status use predefined values.
 
-### Business Rules
+### Allocation Validation
 
+-   A vendor must be selected.
+-   A stall must be selected.
+-   A market date is required.
+-   Only available stalls are displayed.
+-   A vendor cannot receive multiple allocations for the same market
+    date.
+
+## Business Rules and Data Integrity
+
+-   A vendor with an allocation cannot be deleted.
 -   An allocated stall cannot be deleted.
--   A vendor referenced by an allocation cannot be deleted.
--   SQL Server foreign keys provide database-level referential
-    integrity.
+-   Allocating a stall changes its status to `Occupied`.
+-   Deleting an allocation changes the stall status to `Available`.
+-   SQLite foreign keys support relational integrity.
+-   Allocation creation uses a transaction so the allocation insert and
+    stall-status update are treated as one logical operation.
 
 ## Error Handling
 
-Asynchronous route operations use `try...catch`. API errors are logged
-on the server and user-friendly messages are returned to the frontend.
+API routes use `try...catch` blocks. Errors are logged on the server for
+debugging and user-friendly messages are returned to the frontend.
 
-The application also checks business rules before deletion. For example,
-the vendor delete route checks the Allocations table before deleting a
-vendor. This avoids showing a raw SQL Server foreign key error to the
-user.
+Example:
+
+``` json
+{
+    "message": "Unable to load vendors."
+}
+```
+
+Business rule checks are performed before deletion and allocation
+operations to avoid exposing raw database errors.
 
 ## DRY and Code Readability
-
-The project was refactored to reduce repeated code.
 
 -   Repeated sidebar markup was replaced with shared sidebar logic.
 -   Shared table-message rendering was introduced for empty result
     tables.
--   Validation logic was extracted into `utils/validation.js` for
-    testability.
--   Common logic was reused where practical.
+-   Validation rules were extracted into `utils/validation.js`.
+-   Allocation dropdowns show messages when no records are available.
+-   Common logic is reused where practical.
 
 These changes follow the DRY principle: **Don't Repeat Yourself**.
 
@@ -310,53 +410,50 @@ These changes follow the DRY principle: **Don't Repeat Yourself**.
 
 ### Unit Tests
 
-Unit tests verify validation logic independently from the database and
-UI. Vendor and stall validation scenarios are tested with the built-in
-Node.js Test Runner.
+Unit tests verify vendor and stall validation logic independently from
+the database and user interface. The built-in Node.js Test Runner is
+used.
 
 ### Integration Tests
 
-Integration tests verify vendor CRUD API behaviour through the Express
-application. The Express `app` is exported from `server.js` so tests can
-access the application without always starting the normal server
-listener.
+Vendor CRUD integration tests verify interaction between the Express API
+and SQLite database.
 
-Run all automated tests with:
+The integration test covers:
+
+1.  Creating a vendor through POST.
+2.  Retrieving the created vendor through GET.
+3.  Updating the vendor through PUT.
+4.  Deleting the test vendor through DELETE.
+
+The Express `app` is exported from `server.js` so tests can access the
+application without always starting the normal server listener.
+
+Run all tests with:
 
 ``` bash
 npm test
 ```
 
-## Installation and Setup
+All current automated tests pass with the final SQLite implementation.
+
+## Installation and Local Setup
 
 ### Prerequisites
 
 -   Node.js
 -   npm
--   Microsoft SQL Server
--   ODBC Driver 17 for SQL Server
 -   Git
+
+A separate database server is not required.
 
 ### Clone and Install
 
 ``` bash
 git clone <repository-url>
-cd <project-folder>
+cd farmers-market-system
 npm install
 ```
-
-### Environment Variables
-
-Create a `.env` file in the project root.
-
-For the current Windows-authenticated development configuration:
-
-``` env
-DB_SERVER=YOUR_SQL_SERVER
-DB_DATABASE=FarmersMarketDB
-```
-
-Do not commit `.env`.
 
 ### Run the Project
 
@@ -364,15 +461,16 @@ Do not commit `.env`.
 npm run dev
 ```
 
-If required:
-
-``` bash
-node server.js
-```
-
 Open:
 
+``` text
 http://localhost:3000
+```
+
+Production start command:
+
+``` bash
+npm start
 ```
 
 ### Run Tests
@@ -381,137 +479,259 @@ http://localhost:3000
 npm test
 ```
 
-## Commit Reference Traceability
+## SQLite Database Initialisation
 
-A reference in this table identifies documentation or learning material
-used to understand a technical concept.
+The application automatically creates the required SQLite tables when
+the server starts.
+
+Database initialisation logic is located in:
+
+``` text
+db/initDatabase.js
+```
+
+Local database files are excluded from Git using:
+
+``` text
+*.db
+```
+
+## Cloud Deployment
+
+The application is deployed using Railway.
+
+### Deployment Process
+
+1.  Source code is stored in GitHub.
+2.  Railway is connected to the GitHub repository.
+3.  Railway installs Node.js dependencies.
+4.  Railway starts the application using `npm start`.
+5.  Express listens on the port provided by the deployment environment.
+6.  SQLite data is stored using a persistent Railway volume.
+7.  Railway provides a public HTTPS domain.
+
+The server supports local and cloud environments with:
+
+``` javascript
+const PORT = process.env.PORT || 3000;
+```
+
+### Persistent Database Storage
+
+The SQLite database path is configured through `DB_PATH`. The deployed
+database file is stored on Railway persistent volume storage.
+
+## Git Development Process
+
+The project was developed incrementally using Git and GitHub. The
+repository history shows project setup, API development, frontend
+development, validation, testing, documentation, DRY refactoring, SQLite
+integration, Railway deployment preparation, and deployment
+troubleshooting.
+
+## Commit Reference Traceability
 
   -----------------------------------------------------------------------
   Commit                  Work                    Reference / Basis
   ----------------------- ----------------------- -----------------------
+  `4e994f4`               Initial repository      Self
+                          commit                  
+
+  `47a63f2`               Initial project setup   Self
+
   `35ac810`               Initial project setup   npm documentation -
-                                                  Creating a package.json
-                                                  file
+                                                  package setup
 
-  `2062570`               Vendor endpoints and    Express Routing Guide;
-                          database connection     node-mssql
-                                                  documentation
+  `2062570`               Initial vendor          Express Routing Guide;
+                          endpoints and database  database connectivity
+                          connectivity            learning and
+                                                  self-implementation
 
-  `086c724`               API endpoints           Express Routing Guide
+  `086c724`               Additional API          Express Routing Guide
+                          endpoints               
 
   `e025e26`               Vendor HTML changes     MDN Web Docs - HTML
-                                                  forms
+                                                  Forms
 
   `f4c5d9c`               Endpoint naming changes Self - API naming
                                                   cleanup
 
   `0be4ce6`               Management tabs         Self - UI organisation
-                                                  from project
-                                                  requirements
 
-  `920ca2f`               Login page changes      MDN Web Docs - Using
-                                                  the Fetch API; HTML
-                                                  forms
+  `920ca2f`               Login page changes      MDN Fetch API and HTML
+                                                  Forms
 
-  `b7a9635`               Report functionality    MDN Web Docs - Blob;
-                          and CRUD fixes          Express Routing Guide;
+  `b7a9635`               Report functionality    MDN Blob; Express
+                          and CRUD fixes          Routing Guide;
                                                   self-debugging
 
-  `6cb094d`               User input validations  MDN Web Docs -
-                                                  Client-side form
-                                                  validation
+  `6cb094d`               Input validation        MDN Client-side Form
+                                                  Validation
 
   `cf0a4e4`               Reusable validation     Self - extraction of
-                          utility                 existing validation
-                                                  rules
+                          utility                 validation rules
 
-  `f1e5b9b`               Vendor and stall        Node.js Test Runner
-                          validation tests        documentation
+  `f1e5b9b`               Automated validation    Node.js Test Runner
+                          tests                   documentation
 
   `a05ef05`               Export Express app for  Node.js CommonJS
-                          integration tests       Modules documentation
+                          integration testing     Modules
 
-  `a82f6d5`               Missing vendor GET      Express Routing Guide
-                          route handling          
+  `a82f6d5`               Handle missing vendor   Express Routing Guide
+                          GET record              
 
   `1cb9946`               Vendor CRUD integration Node.js Test Runner
                           tests                   documentation
 
   `7bda734`               Project overview and    Self - project
-                          problem statement       requirements
+                          problem statement       requirements analysis
 
   `280c66b`               Stakeholders and        Self - requirements
                           requirements            analysis
 
   `92251c7`               Technology stack and    Self - implemented
-                          architecture            project architecture
+                          architecture            architecture
 
   `a36dd9f`               Testing strategy        Node.js Test Runner
-                          documentation           documentation; self
+                                                  documentation and
+                                                  self-analysis
 
-  `442d387`               Installation and        npm documentation;
-                          testing instructions    self - repository setup
+  `442d387`               Installation and test   npm documentation and
+                          instructions            repository setup
 
-  `acc9e4b`               Reusable shared sidebar MDN Web Docs - Using
-                                                  the Fetch API; self -
+  `acc9e4b`               Reusable shared sidebar MDN Fetch API; self -
                                                   DRY refactoring
 
-  `7a01a66`               Logout confirmation     MDN Web Docs -
-                                                  Window.confirm()
+  `7a01a66`               Logout confirmation     MDN Window.confirm()
 
   `7e46d1c`               DRY code refactoring    Self - removal of
                                                   duplicated code
+
+  `970c627`               README documentation    Self - project
+                                                  documentation
+
+  `0e6efb3`               Install SQLite package  Self - dependency
+                          and remove unused       cleanup
+                          database packages       
+
+  `d5b77e1`               Refactor application    better-sqlite3 API;
+                          data storage to SQLite  SQLite documentation;
+                                                  GenAI-assisted guidance
+                                                  reviewed and tested by
+                                                  the student
+
+  `bcf481d`               Prepare SQLite          Railway deployment and
+                          application for Railway volume documentation;
+                          deployment              GenAI-assisted guidance
+                                                  reviewed by the student
+
+  `73219e5`               Exclude local           npm dependency
+                          dependencies from       practices; deployment
+                          deployment              debugging;
+                                                  GenAI-assisted
+                                                  troubleshooting
+                                                  reviewed by the student
+
+  `b921d24`               Add `.gitignore` file   Git documentation;
+                                                  deployment cleanup
   -----------------------------------------------------------------------
+
+## Attribution and Assistance Summary
+
+The application was developed incrementally by the student using Git and
+GitHub.
+
+External documentation was used to understand JavaScript, Express
+routing, Fetch API communication, Node.js testing, SQLite integration,
+and Railway deployment.
+
+Generative AI assistance was used as a development support tool for:
+
+-   Brainstorming project improvements.
+-   Explaining API and database concepts.
+-   Explaining primary and foreign keys.
+-   Suggesting testing approaches.
+-   Explaining API error handling.
+-   Supporting SQLite database integration and data-layer refactoring.
+-   Supporting Railway deployment configuration.
+-   Troubleshooting the native `better-sqlite3` deployment issue.
+-   Supporting README structure and documentation review.
+
+AI-assisted suggestions were reviewed, integrated, modified, manually
+tested, and evaluated against the project requirements by the student.
+
+The student remains responsible for understanding the implemented system
+and evaluating integrated resources and assistance.
 
 ## References
 
-1.  Express.js, **Routing Guide** -
+1.  Express.js, **Routing Guide**\
     https://expressjs.com/en/guide/routing.html
-2.  Node.js, **Test Runner** - https://nodejs.org/api/test.html
-3.  Node.js, **CommonJS Modules** - https://nodejs.org/api/modules.html
-4.  MDN Web Docs, **Using the Fetch API** -
+2.  Node.js, **Test Runner**\
+    https://nodejs.org/api/test.html
+3.  Node.js, **CommonJS Modules**\
+    https://nodejs.org/api/modules.html
+4.  MDN Web Docs, **Using the Fetch API**\
     https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
-5.  MDN Web Docs, **Client-side Form Validation** -
+5.  MDN Web Docs, **Client-side Form Validation**\
     https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms/Form_validation
-6.  MDN Web Docs, **HTML Forms** -
+6.  MDN Web Docs, **HTML Forms**\
     https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Forms
-7.  MDN Web Docs, **Window.confirm()** -
+7.  MDN Web Docs, **Window.confirm()**\
     https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm
-8.  MDN Web Docs, **Blob** -
+8.  MDN Web Docs, **Blob**\
     https://developer.mozilla.org/en-US/docs/Web/API/Blob
-9.  node-mssql, **Documentation** -
-    https://github.com/tediousjs/node-mssql
-10. npm, **Creating a package.json file** -
+9.  npm, **Creating a package.json File**\
     https://docs.npmjs.com/creating-a-package-json-file
+10. SQLite, **Documentation**\
+    https://sqlite.org/docs.html
+11. SQLite, **Foreign Key Support**\
+    https://sqlite.org/foreignkeys.html
+12. better-sqlite3, **API Documentation**\
+    https://github.com/WiseLibs/better-sqlite3/blob/master/docs/api.md
+13. Railway, **Volumes Documentation**\
+    https://docs.railway.com/volumes
+14. Railway, **Volume Reference**\
+    https://docs.railway.com/volumes/reference
+15. Git, **gitignore Documentation**\
+    https://git-scm.com/docs/gitignore
 
 ## Known Limitations
 
--   The current database connection is intended for the local Windows
-    SQL Server development environment.
--   Cloud deployment requires a remotely accessible SQL Server database.
--   Authentication is basic and could be strengthened for real time use.
--   Additional API integration tests can be added for stalls and
-    allocations.
--   Additional server-side validation can be added.
+-   Authentication is basic and intended for a proof-of-concept.
+-   Passwords should use secure hashing in a production system.
+-   The application mainly focuses on administrator operations.
+-   Integration testing currently focuses on vendor CRUD.
+-   Additional stall and allocation integration tests could be added.
+-   SQLite is suitable for this proof-of-concept, but a larger system
+    may require a dedicated database service.
+-   Accessibility and responsive design could be improved.
 
 ## Future Improvements
 
--   Role-based authentication.
--   Stronger password security.
--   Cloud database deployment.
+-   Password hashing.
+-   Role-based access control.
+-   Vendor-specific user accounts.
+-   Stall and allocation integration tests.
 -   Pagination.
 -   Additional report filters.
--   Stall and allocation API integration tests.
--   GitHub Actions for automated test execution.
--   Accessibility and responsive UI improvements.
+-   GitHub Actions for automated testing.
+-   Accessibility improvements.
+-   Responsive mobile interface.
+-   Additional external service API integration.
 
 ## Conclusion
 
-The Farmers Market Management System demonstrates CRUD operations,
-REST-style Express routes, SQL Server relationships, parameterised
-queries, validation, business rules, error handling, reusable code, unit
-testing, integration testing, and incremental Git-based development.
+The Farmers Market Management System demonstrates a proof-of-concept
+information system developed using JavaScript.
 
-The application provides a practical solution for managing vendors,
-stalls, and market allocations while keeping the project structure and
-implementation understandable and maintainable.
+The application demonstrates CRUD operations, API-based frontend and
+backend communication, Express routing, SQLite relational data storage,
+validation, business rules, database integrity, reusable code, automated
+unit testing, integration testing, Git-based incremental development,
+and cloud deployment.
+
+The final application is publicly accessible through Railway and
+demonstrates interaction between the frontend, Express API, and
+persistent SQLite database.
+
