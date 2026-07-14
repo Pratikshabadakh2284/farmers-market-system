@@ -1,37 +1,97 @@
+const DASHBOARD_API =
+    "/api/dashboard";
+
+
+
+window.initDashboard = function () {
+
+    loadDashboard();
+
+};
+
+
 
 async function loadDashboard() {
 
     try {
 
-        if (!localStorage.getItem("role")) {
+        const response =
+            await fetch(
+                DASHBOARD_API
+            );
 
-    window.location.href = "/";
 
-}
-        const response = await fetch("/api/dashboard");
+        const data =
+            await response.json();
 
-        const data = await response.json();
 
-        console.log(data);
+        if (!response.ok) {
 
-        document.getElementById("vendors").innerHTML = data.vendors;
+            throw new Error(
+                data.message ||
+                "Unable to load dashboard."
+            );
 
-        document.getElementById("stalls").innerHTML = data.stalls;
+        }
 
-        document.getElementById("available").innerHTML = data.available;
 
-        document.getElementById("occupied").innerHTML = data.occupied;
+        setDashboardValue(
+            "totalVendors",
+            data.vendors
+        );
 
-        document.getElementById("allocations").innerHTML = data.allocations;
+
+        setDashboardValue(
+            "totalStalls",
+            data.stalls
+        );
+
+
+        setDashboardValue(
+            "availableStalls",
+            data.available
+        );
+
+
+        setDashboardValue(
+            "occupiedStalls",
+            data.occupied
+        );
+
+
+        setDashboardValue(
+            "totalAllocations",
+            data.allocations
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Dashboard loading error:",
+            error
+        );
 
     }
 
-    catch (err) {
+}
 
-        console.error(err);
+
+
+function setDashboardValue(
+    id,
+    value
+) {
+
+    const element =
+        document.getElementById(id);
+
+
+    if (element) {
+
+        element.textContent =
+            value ?? 0;
 
     }
 
 }
-
-loadDashboard();

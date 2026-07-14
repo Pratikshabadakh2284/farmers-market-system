@@ -1,145 +1,241 @@
-const API = "/api/allocations";
+const ALLOCATION_API = "/api/allocations";
 
-/* ===========================
-   PAGE LOAD
-=========================== */
 
-window.onload = () => {
-    const today = new Date().toISOString().split("T")[0];
+window.initAllocations = function () {
 
-    document
-        .getElementById("allocationDate")
-        .setAttribute("min", today);
+    loadAllocationVendors();
 
-    loadVendors();
     loadAvailableStalls();
+
     loadAllocations();
+
 };
 
 
-/* ===========================
-   LOAD VENDORS
-=========================== */
-async function loadVendors() {
+async function loadAllocationVendors() {
 
-    const response = await fetch(API + "/vendors");
+    try {
 
-    const vendors = await response.json();
+        const response = await fetch(
+            ALLOCATION_API + "/vendors"
+        );
 
-    let html = "";
+        const vendors = await response.json();
 
-    if (vendors.length === 0) {
+        let html = "";
 
-        html = `
-            <option value="" disabled selected>
-                No vendors found
-            </option>
-        `;
 
-    } else {
+        if (!vendors || vendors.length === 0) {
 
-        html = '<option value="">Select Vendor</option>';
-
-        vendors.forEach(v => {
-
-            html += `
-                <option value="${v.VendorID}">
-                    ${v.VendorName}
+            html = `
+                <option value="" disabled selected>
+                    No vendors found
                 </option>
             `;
 
-        });
+        } else {
+
+            html = `
+                <option value="">
+                    Select Vendor
+                </option>
+            `;
+
+
+            vendors.forEach(vendor => {
+
+                html += `
+                    <option value="${vendor.VendorID}">
+                        ${vendor.VendorName}
+                    </option>
+                `;
+
+            });
+
+        }
+
+
+        document.getElementById(
+            "vendor"
+        ).innerHTML = html;
+
+
+    } catch (error) {
+
+        console.error(
+            "Vendor loading error:",
+            error
+        );
 
     }
-
-    document.getElementById("vendor").innerHTML = html;
 
 }
 
 
-/* ===========================
-   LOAD AVAILABLE STALLS
-=========================== */
 
 async function loadAvailableStalls() {
 
-    const response = await fetch(API + "/availableStalls");
+    try {
 
-    const stalls = await response.json();
+        const response = await fetch(
+            ALLOCATION_API + "/availableStalls"
+        );
 
-    let html = '<option value="">Select Stall</option>';
+        const stalls = await response.json();
 
-    if (stalls?.length === 0) {
+        let html = "";
 
-        html = `
-            <option value="" disabled selected>
-                No available stalls found
-            </option>
-        `;
 
-    } else {
+        if (!stalls || stalls.length === 0) {
 
-        stalls?.forEach(s => {
-
-            html += `
-                <option value="${s.StallID}">
-                    ${s.StallNumber} (${s.LocationZone})
+            html = `
+                <option value="" disabled selected>
+                    No available stalls found
                 </option>
             `;
 
-        });
+        } else {
+
+            html = `
+                <option value="">
+                    Select Stall
+                </option>
+            `;
+
+
+            stalls.forEach(stall => {
+
+                html += `
+                    <option value="${stall.StallID}">
+                        ${stall.StallNumber}
+                        (${stall.LocationZone})
+                    </option>
+                `;
+
+            });
+
+        }
+
+
+        document.getElementById(
+            "stall"
+        ).innerHTML = html;
+
+
+    } catch (error) {
+
+        console.error(
+            "Stall loading error:",
+            error
+        );
 
     }
 
-    document.getElementById("stall").innerHTML = html;
 }
 
 
-/* ===========================
-   LOAD ALLOCATIONS
-=========================== */
 
 async function loadAllocations() {
 
-    const response = await fetch(API + "/getAllAllocations");
+    try {
 
-    const data = await response.json();
+        const response = await fetch(
+            ALLOCATION_API + "/getAllAllocations"
+        );
 
-    let html = "";
+        const allocations = await response.json();
 
-   if (data?.length === 0) {
-    rows = renderMessageRow("No vendors found.");
-   }
 
-    else {
+        if (!response.ok) {
 
-        data.forEach(a => {
+            throw new Error(
+                allocations.message ||
+                "Unable to load allocations."
+            );
 
-            html += `
+        }
 
-            <tr>
 
-                <td>${a.AllocationID}</td>
+        renderAllocations(allocations);
 
-                <td>${a.VendorName}</td>
 
-                <td>${a.StallNumber}</td>
+    } catch (error) {
 
-                <td>${a.LocationZone}</td>
+        console.error(
+            "Allocation loading error:",
+            error
+        );
 
-                <td>${a.MarketDate.substring(0, 10)}</td>
 
-                <td>
+        document.getElementById(
+            "allocationTable"
+        ).innerHTML = renderMessageRow(
+            "Unable to load allocations."
+        );
 
-                    <button onclick="deleteAllocation(${a.AllocationID})">
+    }
 
-                        Delete
+}
 
-                    </button>
 
-                </td>
 
-            </tr>
+function renderAllocations(allocations) {
+
+    let rows = "";
+
+
+    if (
+        !allocations ||
+        allocations.length === 0
+    ) {
+
+        rows = renderMessageRow(
+            "No allocations found."
+        );
+
+    } else {
+
+        allocations.forEach(allocation => {
+
+            rows += `
+
+                <tr>
+
+                    <td>
+                        ${allocation.AllocationID}
+                    </td>
+
+                    <td>
+                        ${allocation.VendorName}
+                    </td>
+
+                    <td>
+                        ${allocation.StallNumber}
+                    </td>
+
+                    <td>
+                        ${allocation.LocationZone}
+                    </td>
+
+                    <td>
+                        ${formatMarketDate(
+                            allocation.MarketDate
+                        )}
+                    </td>
+
+                    <td>
+
+                        <button
+                            type="button"
+                            class="delete-btn"
+                            onclick="deleteAllocation(${allocation.AllocationID})"
+                        >
+                            Delete
+                        </button>
+
+                    </td>
+
+                </tr>
 
             `;
 
@@ -147,185 +243,365 @@ async function loadAllocations() {
 
     }
 
-    document.getElementById("allocationTable").innerHTML = html;
+
+    document.getElementById(
+        "allocationTable"
+    ).innerHTML = rows;
 
 }
 
 
-/* ===========================
-   ADD ALLOCATION
-=========================== */
 
 async function addAllocation() {
+
+    const vendorSelect =
+        document.getElementById("vendor");
+
+    const stallSelect =
+        document.getElementById("stall");
+
+    const dateInput =
+        document.getElementById("allocationDate");
+
+
     const allocation = {
-        VendorID: document.getElementById("vendor").value,
-        StallID: document.getElementById("stall").value,
-        MarketDate: document.getElementById("allocationDate").value
+
+        VendorID: vendorSelect.value,
+
+        StallID: stallSelect.value,
+
+        MarketDate: dateInput.value
+
     };
 
+
     if (!validateAllocation(allocation)) {
+
         return;
+
     }
 
-    try {
-        const response = await fetch(API + "/addAllocation", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(allocation)
-        });
 
-        const result = await response.json();
+    try {
+
+        const response = await fetch(
+            ALLOCATION_API + "/addAllocation",
+            {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json"
+
+                },
+
+                body: JSON.stringify(
+                    allocation
+                )
+
+            }
+        );
+
+
+        const result =
+            await response.json();
+
 
         if (!response.ok) {
-            alert(result.message || "Unable to create allocation.");
+
+            alert(
+                result.message ||
+                "Unable to create allocation."
+            );
+
             return;
+
         }
+
 
         alert(result.message);
 
+
         clearAllocationForm();
 
+
         await loadAllocations();
+
         await loadAvailableStalls();
 
+        await loadAllocationVendors();
+
+
     } catch (error) {
-        console.error(error);
-        alert("Unable to connect to the server.");
+
+        console.error(
+            "Allocation error:",
+            error
+        );
+
+
+        alert(
+            "Unable to connect to the server."
+        );
+
     }
+
 }
 
-/* ===========================
-   DELETE ALLOCATION
-=========================== */
+
+
+function validateAllocation(allocation) {
+
+    if (!allocation.VendorID) {
+
+        alert(
+            "Please select a vendor."
+        );
+
+
+        document.getElementById(
+            "vendor"
+        ).focus();
+
+
+        return false;
+
+    }
+
+
+    if (!allocation.StallID) {
+
+        alert(
+            "Please select an available stall."
+        );
+
+
+        document.getElementById(
+            "stall"
+        ).focus();
+
+
+        return false;
+
+    }
+
+
+    if (!allocation.MarketDate) {
+
+        alert(
+            "Please select a market date."
+        );
+
+
+        document.getElementById(
+            "allocationDate"
+        ).focus();
+
+
+        return false;
+
+    }
+
+
+    const marketDate =
+        new Date(
+            allocation.MarketDate +
+            "T00:00:00"
+        );
+
+
+    const today = new Date();
+
+
+    today.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    if (marketDate < today) {
+
+        alert(
+            "Market date cannot be in the past."
+        );
+
+
+        document.getElementById(
+            "allocationDate"
+        ).focus();
+
+
+        return false;
+
+    }
+
+
+    return true;
+
+}
+
+
+
+function clearAllocationForm() {
+
+    document.getElementById(
+        "vendor"
+    ).value = "";
+
+
+    document.getElementById(
+        "stall"
+    ).value = "";
+
+
+    document.getElementById(
+        "allocationDate"
+    ).value = "";
+
+}
+
+
 
 async function deleteAllocation(id) {
 
-    if (!confirm("Delete this allocation?"))
+    if (
+        !confirm(
+            "Delete this allocation?"
+        )
+    ) {
 
         return;
 
-    const response = await fetch(API + "/deleteAllocation/" + id, {
+    }
 
-        method: "DELETE"
 
-    });
+    try {
 
-    const result = await response.json();
+        const response = await fetch(
+            ALLOCATION_API +
+            "/deleteAllocation/" +
+            id,
+            {
 
-    alert(result.message);
+                method: "DELETE"
 
-    loadAllocations();
+            }
+        );
 
-    loadAvailableStalls();
+
+        const result =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            alert(
+                result.message ||
+                "Unable to delete allocation."
+            );
+
+            return;
+
+        }
+
+
+        alert(result.message);
+
+
+        await loadAllocations();
+
+        await loadAvailableStalls();
+
+        await loadAllocationVendors();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        alert(
+            "Unable to connect to the server."
+        );
+
+    }
 
 }
 
 
-/* ===========================
-   SEARCH
-=========================== */
 
 async function searchAllocation() {
 
-    const text = document.getElementById("search").value;
+    const text =
+        document.getElementById(
+            "search"
+        ).value.trim();
+
 
     if (text === "") {
 
-        loadAllocations();
+        await loadAllocations();
 
         return;
 
     }
 
-    const response = await fetch(API + "/searchAllocation/" + text);
 
-    const data = await response.json();
+    try {
 
-    let html = "";
+        const response = await fetch(
+            ALLOCATION_API +
+            "/searchAllocation/" +
+            encodeURIComponent(text)
+        );
 
-    if (data?.length === 0) {
-        rows = renderMessageRow("No vendors found.");
-    }
 
-    else {
+        const allocations =
+            await response.json();
 
-        data.forEach(a => {
 
-            html += `
+        if (!response.ok) {
 
-            <tr>
+            throw new Error(
+                allocations.message ||
+                "Unable to search allocations."
+            );
 
-                <td>${a.AllocationID}</td>
+        }
 
-                <td>${a.VendorName}</td>
 
-                <td>${a.StallNumber}</td>
+        renderAllocations(
+            allocations
+        );
 
-                <td>${a.LocationZone}</td>
 
-                <td>${a.MarketDate.substring(0, 10)}</td>
+    } catch (error) {
 
-                <td>
-
-                    <button onclick="deleteAllocation(${a.AllocationID})">
-
-                        Delete
-
-                    </button>
-
-                </td>
-
-            </tr>
-
-            `;
-
-        });
+        console.error(
+            "Allocation search error:",
+            error
+        );
 
     }
-
-    document.getElementById("allocationTable").innerHTML = html;
 
 }
 
-function validateAllocation(allocation) {
-    if (!allocation.VendorID) {
-        alert("Please select a vendor.");
-        document.getElementById("vendor").focus();
-        return false;
+
+
+function formatMarketDate(value) {
+
+    if (!value) {
+
+        return "";
+
     }
 
-    if (!allocation.StallID) {
-        alert("Please select an available stall.");
-        document.getElementById("stall").focus();
-        return false;
-    }
 
-    if (!allocation.MarketDate) {
-        alert("Please select a market date.");
-        document.getElementById("allocationDate").focus();
-        return false;
-    }
+    return String(value)
+        .substring(0, 10);
 
-    const selectedDate = new Date(
-        allocation.MarketDate + "T00:00:00"
-    );
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    if (selectedDate < today) {
-        alert("Market date cannot be in the past.");
-        document.getElementById("allocationDate").focus();
-        return false;
-    }
-
-    return true;
-}
-
-function clearAllocationForm() {
-    document.getElementById("vendor").value = "";
-    document.getElementById("stall").value = "";
-    document.getElementById("allocationDate").value = "";
 }
