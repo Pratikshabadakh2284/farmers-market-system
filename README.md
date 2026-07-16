@@ -686,38 +686,40 @@ The repository history shows project setup, API development, frontend developmen
 | `7e46d1c` | DRY code refactoring | Self - removal of duplicated code |
 | `970c627` | README documentation | Self - project documentation |
 | `0e6efb3` | Install SQLite package and remove unused database packages | Self - dependency cleanup |
-| `d5b77e1` | Refactor application data storage to SQLite | better-sqlite3 API; SQLite documentation; GenAI-assisted guidance reviewed and tested by the student |
-| `bcf481d` | Prepare SQLite application for Railway deployment | Railway deployment and volume documentation; GenAI-assisted guidance reviewed by the student |
-| `73219e5` | Exclude local dependencies from deployment | npm dependency practices; deployment debugging; GenAI-assisted troubleshooting reviewed by the student |
+| `d5b77e1` | Refactor application data storage to SQLite | better-sqlite3 API; SQLite documentation; GenAI-assisted guidance reviewed and tested by the me |
+| `bcf481d` | Prepare SQLite application for Railway deployment | Railway deployment and volume documentation; GenAI-assisted guidance reviewed by the me |
+| `73219e5` | Exclude local dependencies from deployment | npm dependency practices; deployment debugging; GenAI-assisted troubleshooting reviewed by the me |
 | `b921d24` | Add `.gitignore` file | Git documentation; deployment cleanup |
-| `89faafa` | Dynamic section navigation without full page refresh | MDN Fetch API; MDN DOMParser; GenAI-assisted guidance reviewed, integrated, and manually tested by the student |
-| `80cb02e` | Allocation validation and navigation fixes | MDN Client-side Form Validation; self-testing and debugging; GenAI-assisted troubleshooting reviewed and tested by the student |
+| `89faafa` | Dynamic section navigation without full page refresh | MDN Fetch API; MDN DOMParser; GenAI-assisted guidance reviewed, integrated, and manually tested by the me |
+| `80cb02e` | Allocation validation and navigation fixes | MDN Client-side Form Validation; self-testing and debugging; GenAI-assisted troubleshooting reviewed and tested by the me |
 
 
 ---
 
 ## Attribution and Assistance Summary
 
-The application was developed incrementally by the student using Git and GitHub.
+The application was developed incrementally using Git and GitHub.
 
 External documentation was used to understand JavaScript, Express routing, Fetch API communication, Node.js testing, SQLite integration, dynamic DOM updates, and Railway deployment.
 
-Generative AI assistance was used as a development support tool for:
+Generative AI(Chatgpt) assistance :
 
 - Supporting SQLite database integration and data-layer refactoring.
 - Supporting Railway deployment configuration.
+- Implementation of the authentication part of the application.
 - Troubleshooting the native `better-sqlite3` deployment issue.
 - Supporting dynamic section navigation without a full page refresh.
 - Supporting validation troubleshooting.
 - Supporting README structure and documentation review.
+- to generate Report functionality.
 
-AI-assisted suggestions were reviewed, integrated, modified, manually tested, and evaluated against the project requirements by the student.
+AI-assisted suggestions were reviewed, integrated, modified, manually tested, and evaluated against the project requirements.
 
-The student remains responsible for understanding the implemented system and evaluating integrated resources and assistance.
+I am responsible for understanding the implemented system and evaluating integrated resources and assistance.
 
 ---
 
-## References
+## Learning Resources & Documentation Referenced
 
 1. Express.js, **Routing Guide**  
    https://expressjs.com/en/guide/routing.html
@@ -770,37 +772,10 @@ The student remains responsible for understanding the implemented system and eva
 17. Git, **gitignore Documentation**  
     https://git-scm.com/docs/gitignore
 
+18.OpenAI, ChatGPT. 
+   https://chatgpt.com
 ---
 
-## Known Limitations
-
-- Authentication is basic and intended for a proof-of-concept.
-- Passwords should use secure hashing in a production system.
-- The application mainly focuses on administrator operations.
-- Integration testing currently focuses on vendor CRUD.
-- Additional stall and allocation integration tests could be added.
-- SQLite is suitable for this proof-of-concept, but a larger system may require a dedicated managed database service.
-- Dynamic section navigation currently focuses on the main management sections.
-- Accessibility and responsive design could be improved.
-
----
-
-## Future Improvements
-
-- Password hashing.
-- Role-based access control.
-- Vendor-specific user accounts.
-- Stall and allocation integration tests.
-- Pagination.
-- Additional report filters.
-- GitHub Actions for automated testing.
-- Accessibility improvements.
-- Responsive mobile interface.
-- Browser history integration for dynamic section navigation.
-- Loading indicators during API requests.
-- Additional external service API integration.
-
----
 
 ## Conclusion
 
